@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, ConfigProvider, AuthState, LoginCredentials } from '../types/auth';
+import { authApi } from '../services/authApi';
 
 // Mock config providers
 const MOCK_PROVIDERS: ConfigProvider[] = [
@@ -55,6 +56,8 @@ interface AuthContextType extends AuthState {
   logout: () => void;
   providers: ConfigProvider[];
   switchProvider: (providerId: string) => void;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  loginError: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -64,6 +67,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const saved = localStorage.getItem('dns_user');
     return saved ? JSON.parse(saved) : null;
   });
+
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const [currentProvider, setCurrentProvider] = useState<ConfigProvider | null>(() => {
     const savedId = localStorage.getItem('dns_provider');
@@ -87,25 +92,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [currentProvider]);
 
   const login = async (credentials: LoginCredentials): Promise<boolean> => {
-    // Mock login - in production, this would call an API
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    if (credentials.username && credentials.password) {
-      const mockUser: User = {
-        id: '1',
+    setLoginError(null);
+    try {
+      const response = await authApi.login({
         username: credentials.username,
-        email: `${credentials.username}@example.com`,
-        role: credentials.username === 'admin' ? 'admin' : 'user'
+        password: credentials.password,
+      });
+
+      localStorage.setItem('dns_token', response.token);
+
+      const loggedInUser: User = {
+        id: response.username,
+        username: response.username,
+        email: `${response.username}@local`,
+        role: response.role as 'admin' | 'user',
       };
-      setUser(mockUser);
+      setUser(loggedInUser);
       return true;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '登录失败';
+      setLoginError(message);
+      return false;
     }
-    return false;
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('dns_user');
+    localStorage.removeItem('dns_token');
+  };
+
+  const changePassword = async (currentPassword: string, newPassword: string): Promise<void> => {
+    await authApi.changePassword({ currentPassword, newPassword });
   };
 
   const switchProvider = (providerId: string) => {
@@ -124,7 +142,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         providers,
         login,
         logout,
-        switchProvider
+        switchProvider,
+        changePassword,
+        loginError,
       }}
     >
       {children}
