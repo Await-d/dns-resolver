@@ -1,33 +1,22 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import Sidebar from '../components/Sidebar';
-import MobileSidebar from '../components/MobileSidebar';
+import Layout from '../components/Layout';
 import MobileBottomNav from '../components/MobileBottomNav';
 import DnsQueryForm from '../components/DnsQueryForm';
 import IspSelector from '../components/IspSelector';
 import ResultTable from '../components/ResultTable';
 import { useIsps, useDnsCompare } from '../hooks/useDnsQuery';
-import { useAuth } from '../contexts/AuthContext';
 import type { RecordType, ResolveResult } from '../types/dns';
 
 export default function HomePage() {
   const { t } = useTranslation();
-  const { currentProvider } = useAuth();
 
   const { data: isps = [], isLoading: isLoadingIsps } = useIsps();
   const { mutate: compare, isPending } = useDnsCompare();
 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mobileActiveTab, setMobileActiveTab] = useState<'query' | 'providers' | 'results'>('query');
   const [selectedIsps, setSelectedIsps] = useState<string[]>([]);
   const [results, setResults] = useState<ResolveResult[]>([]);
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     if (isps.length > 0 && selectedIsps.length === 0) {
@@ -80,164 +69,175 @@ export default function HomePage() {
     });
   };
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('zh-CN', { hour12: false });
-  };
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-  };
-
   return (
-    <div className="min-h-screen hex-pattern">
-      {/* Desktop Sidebar */}
-      <div className="desktop-sidebar hidden md:block">
-        <Sidebar
-          collapsed={sidebarCollapsed}
-          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-        />
-      </div>
-
-      {/* Mobile Sidebar */}
-      <MobileSidebar
-        isOpen={mobileSidebarOpen}
-        onClose={() => setMobileSidebarOpen(false)}
-      />
-
-      {/* Mobile Header */}
-      <header className="mobile-header">
-        <button
-          onClick={() => setMobileSidebarOpen(true)}
-          className="mobile-menu-btn"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 border-2 border-[var(--neon-cyan)] flex items-center justify-center">
-            <span className="text-[var(--neon-cyan)] text-sm font-bold display">D</span>
-          </div>
-          <span className="display text-sm font-bold text-[var(--neon-cyan)]">DNS</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div className="pulse-dot success"></div>
-          <span className="text-[10px] text-[var(--text-muted)]">{formatTime(currentTime)}</span>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div
-        className={`transition-all duration-300 md:ml-64 ${
-          sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'
-        }`}
-      >
-        {/* Desktop Top Bar */}
-        <header className="hidden md:block sticky top-0 z-40 bg-[var(--bg-primary)]/90 backdrop-blur-sm border-b border-[var(--border-color)]">
-          <div className="px-6 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {currentProvider && (
-                <div className="flex items-center gap-2 text-sm">
-                  <span className="text-xl">{currentProvider.icon}</span>
-                  <span className="text-[var(--text-primary)]">{currentProvider.name}</span>
-                  <span className="text-[var(--text-muted)]">·</span>
-                  <span className="text-[var(--text-muted)]">{currentProvider.ispCount} DNS</span>
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="pulse-dot success"></div>
-                <span className="text-[var(--text-secondary)]">{t('header.systemOnline')}</span>
-              </div>
-              <div className="h-4 w-px bg-[var(--border-color)]"></div>
-              <div className="text-[var(--text-muted)] font-mono">
-                <span className="text-[var(--neon-cyan)]">{formatDate(currentTime)}</span>
-                <span className="mx-2">|</span>
-                <span className="text-[var(--neon-green)]">{formatTime(currentTime)}</span>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <main className="p-4 md:p-6 pb-24 md:pb-6">
-          {/* Desktop Layout */}
-          <div className="hidden md:block">
-            {/* Query & Stats */}
-            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
-              <div className="xl:col-span-2">
-                <div className="cyber-card cyber-corner p-5 h-full">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-1 h-5 bg-[var(--neon-cyan)]"></div>
-                    <h2 className="display text-xs font-semibold tracking-widest text-[var(--text-primary)] uppercase">
-                      {t('query.title')}
-                    </h2>
-                  </div>
-                  <DnsQueryForm onSubmit={handleSubmit} isLoading={isPending} />
-                </div>
-              </div>
-
-              <div className="cyber-card cyber-corner p-5">
+    <Layout>
+      <div className="p-4 md:p-6 pb-24 md:pb-6">
+        {/* Desktop Layout */}
+        <div className="hidden md:block">
+          {/* Query & Stats */}
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+            <div className="xl:col-span-2">
+              <div className="cyber-card cyber-corner p-5 h-full">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-1 h-5 bg-[var(--neon-green)]"></div>
+                  <div className="w-1 h-5 bg-[var(--neon-cyan)]"></div>
                   <h2 className="display text-xs font-semibold tracking-widest text-[var(--text-primary)] uppercase">
-                    {t('results.stats')}
+                    {t('query.title')}
                   </h2>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 border border-[var(--border-color)] bg-[var(--bg-tertiary)]">
-                    <div className="text-2xl font-bold text-[var(--neon-cyan)] font-mono">
-                      {results.length}
-                    </div>
-                    <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">
-                      {t('results.totalQueries')}
-                    </div>
+                <DnsQueryForm onSubmit={handleSubmit} isLoading={isPending} />
+              </div>
+            </div>
+
+            <div className="cyber-card cyber-corner p-5">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-1 h-5 bg-[var(--neon-green)]"></div>
+                <h2 className="display text-xs font-semibold tracking-widest text-[var(--text-primary)] uppercase">
+                  {t('results.stats')}
+                </h2>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-3 border border-[var(--border-color)] bg-[var(--bg-tertiary)]">
+                  <div className="text-2xl font-bold text-[var(--neon-cyan)] font-mono">
+                    {results.length}
                   </div>
-                  <div className="p-3 border border-[var(--border-color)] bg-[var(--bg-tertiary)]">
-                    <div className="text-2xl font-bold text-[var(--neon-green)] font-mono">
-                      {results.filter(r => r.success).length}
-                    </div>
-                    <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">
-                      {t('results.success')}
-                    </div>
+                  <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">
+                    {t('results.totalQueries')}
                   </div>
-                  <div className="p-3 border border-[var(--border-color)] bg-[var(--bg-tertiary)]">
-                    <div className="text-2xl font-bold text-[var(--neon-orange)] font-mono">
-                      {results.length > 0 ? Math.round(results.reduce((a, r) => a + r.queryTimeMs, 0) / results.length) : 0}
-                    </div>
-                    <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">
-                      {t('results.avgTime')} (ms)
-                    </div>
+                </div>
+                <div className="p-3 border border-[var(--border-color)] bg-[var(--bg-tertiary)]">
+                  <div className="text-2xl font-bold text-[var(--neon-green)] font-mono">
+                    {results.filter(r => r.success).length}
                   </div>
-                  <div className="p-3 border border-[var(--border-color)] bg-[var(--bg-tertiary)]">
-                    <div className="text-2xl font-bold text-[var(--neon-magenta)] font-mono">
-                      {selectedIsps.length}
-                    </div>
-                    <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">
-                      {t('providers.selected')}
-                    </div>
+                  <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">
+                    {t('results.success')}
+                  </div>
+                </div>
+                <div className="p-3 border border-[var(--border-color)] bg-[var(--bg-tertiary)]">
+                  <div className="text-2xl font-bold text-[var(--neon-orange)] font-mono">
+                    {results.length > 0 ? Math.round(results.reduce((a, r) => a + r.queryTimeMs, 0) / results.length) : 0}
+                  </div>
+                  <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">
+                    {t('results.avgTime')} (ms)
+                  </div>
+                </div>
+                <div className="p-3 border border-[var(--border-color)] bg-[var(--bg-tertiary)]">
+                  <div className="text-2xl font-bold text-[var(--neon-magenta)] font-mono">
+                    {selectedIsps.length}
+                  </div>
+                  <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">
+                    {t('providers.selected')}
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* ISP Selection */}
-            <div className="cyber-card cyber-corner p-5 mb-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-1 h-5 bg-[var(--neon-magenta)]"></div>
-                <h2 className="display text-xs font-semibold tracking-widest text-[var(--text-primary)] uppercase">
-                  {t('providers.title')}
-                </h2>
-                <div className="flex-1"></div>
-                <span className="text-xs text-[var(--text-muted)]">
-                  {selectedIsps.length} / {isps.length} {t('providers.selected')}
+          {/* ISP Selection */}
+          <div className="cyber-card cyber-corner p-5 mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-1 h-5 bg-[var(--neon-magenta)]"></div>
+              <h2 className="display text-xs font-semibold tracking-widest text-[var(--text-primary)] uppercase">
+                {t('providers.title')}
+              </h2>
+              <div className="flex-1"></div>
+              <span className="text-xs text-[var(--text-muted)]">
+                {selectedIsps.length} / {isps.length} {t('providers.selected')}
+              </span>
+            </div>
+            {isLoadingIsps ? (
+              <div className="py-6">
+                <div className="loading-bar mb-3"></div>
+                <p className="text-center text-[var(--text-muted)] text-sm">{t('common.loading')}</p>
+              </div>
+            ) : (
+              <IspSelector
+                isps={isps}
+                selectedIsps={selectedIsps}
+                onChange={setSelectedIsps}
+                disabled={isPending}
+              />
+            )}
+          </div>
+
+          {/* Results */}
+          <div className="cyber-card cyber-corner p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-1 h-5 bg-[var(--neon-green)]"></div>
+              <h2 className="display text-xs font-semibold tracking-widest text-[var(--text-primary)] uppercase">
+                {t('results.title')}
+              </h2>
+              <div className="flex-1"></div>
+              {results.length > 0 && (
+                <span className="text-xs text-[var(--neon-green)]">
+                  {results.filter(r => r.success).length} / {results.length} {t('results.success')}
+                </span>
+              )}
+            </div>
+            {isPending ? (
+              <div className="py-12">
+                <div className="loading-bar mb-4"></div>
+                <p className="text-center text-[var(--text-muted)] text-sm typing-cursor">
+                  {t('query.resolving')}
+                </p>
+              </div>
+            ) : (
+              <ResultTable results={results} onEdit={handleResultEdit} />
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Layout - Tab Based */}
+        <div className="md:hidden">
+          {/* Query Tab */}
+          {mobileActiveTab === 'query' && (
+            <div className="space-y-4 fade-in">
+              {/* Quick Stats */}
+              <div className="grid grid-cols-4 gap-2">
+                <div className="p-2 border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-center">
+                  <div className="text-lg font-bold text-[var(--neon-cyan)] font-mono">{results.length}</div>
+                  <div className="text-[8px] text-[var(--text-muted)] uppercase">{t('results.totalQueries')}</div>
+                </div>
+                <div className="p-2 border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-center">
+                  <div className="text-lg font-bold text-[var(--neon-green)] font-mono">{results.filter(r => r.success).length}</div>
+                  <div className="text-[8px] text-[var(--text-muted)] uppercase">{t('results.success')}</div>
+                </div>
+                <div className="p-2 border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-center">
+                  <div className="text-lg font-bold text-[var(--neon-orange)] font-mono">
+                    {results.length > 0 ? Math.round(results.reduce((a, r) => a + r.queryTimeMs, 0) / results.length) : 0}
+                  </div>
+                  <div className="text-[8px] text-[var(--text-muted)] uppercase">ms</div>
+                </div>
+                <div className="p-2 border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-center">
+                  <div className="text-lg font-bold text-[var(--neon-magenta)] font-mono">{selectedIsps.length}</div>
+                  <div className="text-[8px] text-[var(--text-muted)] uppercase">DNS</div>
+                </div>
+              </div>
+
+              {/* Query Form */}
+              <div className="cyber-card p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-1 h-4 bg-[var(--neon-cyan)]"></div>
+                  <h2 className="display text-[10px] font-semibold tracking-widest text-[var(--text-primary)] uppercase">
+                    {t('query.title')}
+                  </h2>
+                </div>
+                <DnsQueryForm onSubmit={handleSubmit} isLoading={isPending} />
+              </div>
+            </div>
+          )}
+
+          {/* Providers Tab */}
+          {mobileActiveTab === 'providers' && (
+            <div className="cyber-card p-4 fade-in">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-1 h-4 bg-[var(--neon-magenta)]"></div>
+                  <h2 className="display text-[10px] font-semibold tracking-widest text-[var(--text-primary)] uppercase">
+                    {t('providers.title')}
+                  </h2>
+                </div>
+                <span className="text-[10px] text-[var(--text-muted)]">
+                  {selectedIsps.length}/{isps.length}
                 </span>
               </div>
               {isLoadingIsps ? (
@@ -254,149 +254,37 @@ export default function HomePage() {
                 />
               )}
             </div>
+          )}
 
-            {/* Results */}
-            <div className="cyber-card cyber-corner p-5">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-1 h-5 bg-[var(--neon-green)]"></div>
-                <h2 className="display text-xs font-semibold tracking-widest text-[var(--text-primary)] uppercase">
-                  {t('results.title')}
-                </h2>
-                <div className="flex-1"></div>
+          {/* Results Tab */}
+          {mobileActiveTab === 'results' && (
+            <div className="cyber-card p-4 fade-in">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-1 h-4 bg-[var(--neon-green)]"></div>
+                  <h2 className="display text-[10px] font-semibold tracking-widest text-[var(--text-primary)] uppercase">
+                    {t('results.title')}
+                  </h2>
+                </div>
                 {results.length > 0 && (
-                  <span className="text-xs text-[var(--neon-green)]">
-                    {results.filter(r => r.success).length} / {results.length} {t('results.success')}
+                  <span className="text-[10px] text-[var(--neon-green)]">
+                    {results.filter(r => r.success).length}/{results.length}
                   </span>
                 )}
               </div>
               {isPending ? (
-                <div className="py-12">
-                  <div className="loading-bar mb-4"></div>
+                <div className="py-8">
+                  <div className="loading-bar mb-3"></div>
                   <p className="text-center text-[var(--text-muted)] text-sm typing-cursor">
                     {t('query.resolving')}
                   </p>
                 </div>
               ) : (
-                <ResultTable results={results} onEdit={handleResultEdit} />
+                <MobileResultList results={results} />
               )}
             </div>
-          </div>
-
-          {/* Mobile Layout - Tab Based */}
-          <div className="md:hidden">
-            {/* Query Tab */}
-            {mobileActiveTab === 'query' && (
-              <div className="space-y-4 fade-in">
-                {/* Quick Stats */}
-                <div className="grid grid-cols-4 gap-2">
-                  <div className="p-2 border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-center">
-                    <div className="text-lg font-bold text-[var(--neon-cyan)] font-mono">{results.length}</div>
-                    <div className="text-[8px] text-[var(--text-muted)] uppercase">{t('results.totalQueries')}</div>
-                  </div>
-                  <div className="p-2 border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-center">
-                    <div className="text-lg font-bold text-[var(--neon-green)] font-mono">{results.filter(r => r.success).length}</div>
-                    <div className="text-[8px] text-[var(--text-muted)] uppercase">{t('results.success')}</div>
-                  </div>
-                  <div className="p-2 border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-center">
-                    <div className="text-lg font-bold text-[var(--neon-orange)] font-mono">
-                      {results.length > 0 ? Math.round(results.reduce((a, r) => a + r.queryTimeMs, 0) / results.length) : 0}
-                    </div>
-                    <div className="text-[8px] text-[var(--text-muted)] uppercase">ms</div>
-                  </div>
-                  <div className="p-2 border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-center">
-                    <div className="text-lg font-bold text-[var(--neon-magenta)] font-mono">{selectedIsps.length}</div>
-                    <div className="text-[8px] text-[var(--text-muted)] uppercase">DNS</div>
-                  </div>
-                </div>
-
-                {/* Query Form */}
-                <div className="cyber-card p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-1 h-4 bg-[var(--neon-cyan)]"></div>
-                    <h2 className="display text-[10px] font-semibold tracking-widest text-[var(--text-primary)] uppercase">
-                      {t('query.title')}
-                    </h2>
-                  </div>
-                  <DnsQueryForm onSubmit={handleSubmit} isLoading={isPending} />
-                </div>
-              </div>
-            )}
-
-            {/* Providers Tab */}
-            {mobileActiveTab === 'providers' && (
-              <div className="cyber-card p-4 fade-in">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-4 bg-[var(--neon-magenta)]"></div>
-                    <h2 className="display text-[10px] font-semibold tracking-widest text-[var(--text-primary)] uppercase">
-                      {t('providers.title')}
-                    </h2>
-                  </div>
-                  <span className="text-[10px] text-[var(--text-muted)]">
-                    {selectedIsps.length}/{isps.length}
-                  </span>
-                </div>
-                {isLoadingIsps ? (
-                  <div className="py-6">
-                    <div className="loading-bar mb-3"></div>
-                    <p className="text-center text-[var(--text-muted)] text-sm">{t('common.loading')}</p>
-                  </div>
-                ) : (
-                  <IspSelector
-                    isps={isps}
-                    selectedIsps={selectedIsps}
-                    onChange={setSelectedIsps}
-                    disabled={isPending}
-                  />
-                )}
-              </div>
-            )}
-
-            {/* Results Tab */}
-            {mobileActiveTab === 'results' && (
-              <div className="cyber-card p-4 fade-in">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-4 bg-[var(--neon-green)]"></div>
-                    <h2 className="display text-[10px] font-semibold tracking-widest text-[var(--text-primary)] uppercase">
-                      {t('results.title')}
-                    </h2>
-                  </div>
-                  {results.length > 0 && (
-                    <span className="text-[10px] text-[var(--neon-green)]">
-                      {results.filter(r => r.success).length}/{results.length}
-                    </span>
-                  )}
-                </div>
-                {isPending ? (
-                  <div className="py-8">
-                    <div className="loading-bar mb-3"></div>
-                    <p className="text-center text-[var(--text-muted)] text-sm typing-cursor">
-                      {t('query.resolving')}
-                    </p>
-                  </div>
-                ) : (
-                  <MobileResultList results={results} />
-                )}
-              </div>
-            )}
-          </div>
-        </main>
-
-        {/* Desktop Footer */}
-        <footer className="hidden md:block border-t border-[var(--border-color)] py-4 px-6">
-          <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
-            <div className="flex items-center gap-3">
-              <span>{t('app.title')} {t('app.version')}</span>
-              <span className="text-[var(--border-color)]">|</span>
-              <span>{t('app.subtitle')}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-[var(--neon-cyan)]">◆</span>
-              <span>{t('app.footer')}</span>
-            </div>
-          </div>
-        </footer>
+          )}
+        </div>
       </div>
 
       {/* Mobile Bottom Navigation */}
@@ -404,7 +292,7 @@ export default function HomePage() {
         activeTab={mobileActiveTab}
         onTabChange={setMobileActiveTab}
       />
-    </div>
+    </Layout>
   );
 }
 

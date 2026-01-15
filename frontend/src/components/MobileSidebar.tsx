@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -11,7 +11,8 @@ interface MobileSidebarProps {
 export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user, logout, providers, currentProvider, switchProvider } = useAuth();
+  const location = useLocation();
+  const { user, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -19,10 +20,11 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
     onClose();
   };
 
-  const handleProviderSwitch = (providerId: string) => {
-    switchProvider(providerId);
-    onClose();
-  };
+  const navItems = [
+    { path: '/', label: t('nav.dnsQuery'), icon: '🔍' },
+    { path: '/manage', label: t('nav.dnsManage'), icon: '⚙️' },
+    { path: '/ddns', label: t('nav.ddns'), icon: '🔄' },
+  ];
 
   return (
     <>
@@ -66,41 +68,35 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
         <div className="flex-1 overflow-y-auto p-3">
           <div className="mb-3">
             <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">
-              {t('provider.title')}
+              {t('nav.menu')}
             </span>
           </div>
 
           <div className="space-y-2">
-            {providers.map((provider) => {
-              const isActive = currentProvider?.id === provider.id;
-              const isAvailable = provider.isActive;
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path;
 
               return (
-                <button
-                  key={provider.id}
-                  onClick={() => isAvailable && handleProviderSwitch(provider.id)}
-                  disabled={!isAvailable}
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={onClose}
                   className={`w-full flex items-center gap-3 p-3 transition-all ${
                     isActive
                       ? 'bg-[var(--neon-cyan-dim)] border-l-2 border-[var(--neon-cyan)]'
-                      : isAvailable
-                      ? 'hover:bg-[var(--bg-tertiary)] border-l-2 border-transparent'
-                      : 'opacity-40 cursor-not-allowed border-l-2 border-transparent'
+                      : 'hover:bg-[var(--bg-tertiary)] border-l-2 border-transparent'
                   }`}
                 >
-                  <span className="text-xl">{provider.icon}</span>
+                  <span className="text-xl">{item.icon}</span>
                   <div className="flex-1 text-left">
                     <div className={`text-sm ${isActive ? 'text-[var(--neon-cyan)]' : 'text-[var(--text-primary)]'}`}>
-                      {provider.name}
-                    </div>
-                    <div className="text-[10px] text-[var(--text-muted)]">
-                      {provider.ispCount} DNS
+                      {item.label}
                     </div>
                   </div>
                   {isActive && (
                     <div className="w-2 h-2 rounded-full bg-[var(--neon-cyan)] shadow-[0_0_8px_var(--neon-cyan)]"></div>
                   )}
-                </button>
+                </Link>
               );
             })}
           </div>

@@ -94,6 +94,7 @@
     "actions": "Actions"
   },
   "nav": {
+    "menu": "Menu",
     "dnsQuery": "DNS Query",
     "dnsManage": "DNS Manage",
     "ddns": "DDNS"

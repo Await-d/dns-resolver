@@ -4,6 +4,7 @@ using DnsResolver.Application.Commands.CompareDns;
 using DnsResolver.Application.Commands.DdnsTask;
 using DnsResolver.Application.Commands.Auth;
 using DnsResolver.Application.Queries.GetIsps;
+using DnsResolver.Application.Queries.GetDnsProviders;
 using DnsResolver.Application.Queries.GetDdnsTasks;
 using DnsResolver.Application.Services;
 using DnsResolver.Domain.Aggregates.IspProvider;
@@ -142,6 +143,7 @@ builder.Services.AddScoped<IDdnsService, DdnsService>();
 builder.Services.AddScoped<ResolveDnsCommandHandler>();
 builder.Services.AddScoped<CompareDnsCommandHandler>();
 builder.Services.AddScoped<GetIspsQueryHandler>();
+builder.Services.AddScoped<GetDnsProvidersQueryHandler>();
 
 // DDNS Task handlers
 builder.Services.AddScoped<CreateDdnsTaskCommandHandler>();

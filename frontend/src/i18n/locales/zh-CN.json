@@ -94,6 +94,7 @@
     "actions": "操作"
   },
   "nav": {
+    "menu": "功能菜单",
     "dnsQuery": "DNS 查询",
     "dnsManage": "DNS 管理",
     "ddns": "DDNS 动态域名"

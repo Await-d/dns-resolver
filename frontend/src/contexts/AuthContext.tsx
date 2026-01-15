@@ -6,17 +6,29 @@ import { fetchIsps } from '../services/dnsApi';
 
 // ISP 图标和颜色映射
 const ISP_STYLES: Record<string, { icon: string; color: string }> = {
-  telecom: { icon: '📡', color: 'var(--neon-cyan)' },
-  unicom: { icon: '🌐', color: 'var(--neon-green)' },
-  mobile: { icon: '📶', color: 'var(--neon-magenta)' },
-  aliyun: { icon: '☁️', color: 'var(--neon-orange)' },
-  tencent: { icon: '🐧', color: '#00d4ff' },
-  baidu: { icon: '🔍', color: '#2932e1' },
-  google: { icon: '🔎', color: '#4285f4' },
+  alidns: { icon: '☁️', color: 'var(--neon-orange)' },
+  aliesa: { icon: '🌐', color: '#ff6a00' },
+  baiducloud: { icon: '🔍', color: '#2932e1' },
+  callback: { icon: '🔗', color: '#9d4edd' },
   cloudflare: { icon: '🛡️', color: '#f38020' },
-  dnspod: { icon: '🌍', color: '#00a4ff' },
-  opendns: { icon: '🔓', color: '#ff6600' },
-  quad9: { icon: '9️⃣', color: '#00a0d6' },
+  dnsla: { icon: '🌍', color: '#00a4ff' },
+  dnspod: { icon: '🐧', color: '#00d4ff' },
+  dynadot: { icon: '🔷', color: '#0066cc' },
+  dynv6: { icon: '6️⃣', color: '#00cc66' },
+  edgeone: { icon: '⚡', color: '#006eff' },
+  eranet: { icon: '🌐', color: '#ff3366' },
+  gcore: { icon: '🚀', color: '#ff6600' },
+  godaddy: { icon: '🏠', color: '#1bdbdb' },
+  huaweicloud: { icon: '🔴', color: '#e60012' },
+  namecheap: { icon: '💰', color: '#de5833' },
+  namesilo: { icon: '🏷️', color: '#0099cc' },
+  nowcn: { icon: '🇨🇳', color: '#ff0000' },
+  nsone: { icon: '1️⃣', color: '#7b68ee' },
+  porkbun: { icon: '🐷', color: '#f472b6' },
+  spaceship: { icon: '🚀', color: '#6366f1' },
+  tencentcloud: { icon: '🐧', color: '#00a4ff' },
+  trafficroute: { icon: '🛣️', color: '#22c55e' },
+  vercel: { icon: '▲', color: '#000000' },
 };
 
 const DEFAULT_STYLE = { icon: '🌐', color: 'var(--neon-cyan)' };
@@ -25,12 +37,12 @@ function ispToProvider(isp: IspInfo): ConfigProvider {
   const style = ISP_STYLES[isp.id] || DEFAULT_STYLE;
   return {
     id: isp.id,
-    name: isp.name,
-    description: `${isp.primaryDns}${isp.secondaryDns ? ' / ' + isp.secondaryDns : ''}`,
+    name: isp.displayName || isp.name,
+    description: isp.name,
     icon: style.icon,
     color: style.color,
     isActive: true,
-    ispCount: isp.secondaryDns ? 2 : 1,
+    ispCount: 1,
   };
 }
 

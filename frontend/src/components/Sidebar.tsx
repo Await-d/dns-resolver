@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -12,13 +12,20 @@ interface SidebarProps {
 export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user, logout, providers, currentProvider, switchProvider } = useAuth();
+  const location = useLocation();
+  const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
+
+  const navItems = [
+    { path: '/', label: t('nav.dnsQuery'), icon: '🔍' },
+    { path: '/manage', label: t('nav.dnsManage'), icon: '⚙️' },
+    { path: '/ddns', label: t('nav.ddns'), icon: '🔄' },
+  ];
 
   return (
     <aside
@@ -63,41 +70,34 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         {!collapsed && (
           <div className="mb-3">
             <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">
-              {t('provider.title')}
+              {t('nav.menu')}
             </span>
           </div>
         )}
 
         <div className="space-y-2">
-          {providers.map((provider) => {
-            const isActive = currentProvider?.id === provider.id;
-            const isAvailable = provider.isActive;
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
 
             return (
-              <button
-                key={provider.id}
-                onClick={() => isAvailable && switchProvider(provider.id)}
-                disabled={!isAvailable}
-                title={collapsed ? provider.name : undefined}
+              <Link
+                key={item.path}
+                to={item.path}
+                title={collapsed ? item.label : undefined}
                 className={`w-full flex items-center gap-3 p-2 transition-all ${
                   collapsed ? 'justify-center' : ''
                 } ${
                   isActive
                     ? 'bg-[var(--neon-cyan-dim)] border-l-2 border-[var(--neon-cyan)]'
-                    : isAvailable
-                    ? 'hover:bg-[var(--bg-tertiary)] border-l-2 border-transparent'
-                    : 'opacity-40 cursor-not-allowed border-l-2 border-transparent'
+                    : 'hover:bg-[var(--bg-tertiary)] border-l-2 border-transparent'
                 }`}
               >
-                <span className="text-xl flex-shrink-0">{provider.icon}</span>
+                <span className="text-xl flex-shrink-0">{item.icon}</span>
                 {!collapsed && (
                   <div className="flex-1 text-left min-w-0 flex items-center gap-2">
                     <div className="flex-1 min-w-0">
                       <div className={`text-sm truncate ${isActive ? 'text-[var(--neon-cyan)]' : 'text-[var(--text-primary)]'}`}>
-                        {provider.name}
-                      </div>
-                      <div className="text-[10px] text-[var(--text-muted)]">
-                        {provider.ispCount} DNS
+                        {item.label}
                       </div>
                     </div>
                     {isActive && (
@@ -105,7 +105,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                     )}
                   </div>
                 )}
-              </button>
+              </Link>
             );
           })}
         </div>

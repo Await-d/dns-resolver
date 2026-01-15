@@ -7,6 +7,12 @@ export interface DnsRecord {
 export interface IspInfo {
   id: string;
   name: string;
+  displayName: string;
+}
+
+export interface DnsServerInfo {
+  id: string;
+  name: string;
   primaryDns: string;
   secondaryDns?: string;
 }

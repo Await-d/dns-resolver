@@ -95,10 +95,10 @@ export default function IspSelector({ isps, selectedIsps, onChange, disabled }: 
                 <div className={`font-medium truncate transition-colors ${
                   isSelected ? 'text-[var(--neon-cyan)]' : 'text-[var(--text-primary)]'
                 }`}>
-                  {isp.name}
+                  {isp.displayName || isp.name}
                 </div>
                 <div className="text-xs text-[var(--text-muted)] truncate mt-0.5 font-mono">
-                  {isp.primaryDns}
+                  {isp.name}
                 </div>
               </div>
 

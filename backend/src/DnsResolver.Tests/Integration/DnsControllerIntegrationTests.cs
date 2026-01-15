@@ -13,7 +13,7 @@ public class DnsControllerIntegrationTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task GetIsps_ReturnsSuccessAndIspList()
+    public async Task GetIsps_ReturnsSuccessAndDnsProviderList()
     {
         // Act
         var response = await Client.GetAsync("/api/v1/dns/isps");
@@ -22,9 +22,9 @@ public class DnsControllerIntegrationTests : IntegrationTestBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var content = await response.Content.ReadAsStringAsync();
-        content.Should().Contain("telecom");
-        content.Should().Contain("unicom");
-        content.Should().Contain("mobile");
+        content.Should().Contain("cloudflare");
+        content.Should().Contain("alidns");
+        content.Should().Contain("dnspod");
     }
 
     [Fact]

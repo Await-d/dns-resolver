@@ -3,7 +3,7 @@ namespace DnsResolver.Infrastructure.DnsProviders;
 using DnsResolver.Domain.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-public class DnsProviderFactory
+public class DnsProviderFactory : IDnsProviderFactory
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly Dictionary<string, Type> _providerTypes = new(StringComparer.OrdinalIgnoreCase);
@@ -58,13 +58,13 @@ public class DnsProviderFactory
 
     public IEnumerable<string> GetRegisteredProviders() => _providerTypes.Keys;
 
-    public IEnumerable<(string Name, string DisplayName)> GetProviderInfos()
+    public IEnumerable<DnsProviderInfo> GetProviderInfos()
     {
         foreach (var (name, type) in _providerTypes)
         {
             var provider = _serviceProvider.GetService(type) as IDnsProvider;
             if (provider != null)
-                yield return (name, provider.DisplayName);
+                yield return new DnsProviderInfo(name, name, provider.DisplayName);
         }
     }
 }
@@ -98,6 +98,7 @@ public static class DnsProviderServiceExtensions
         services.AddHttpClient<VercelProvider>();
 
         services.AddSingleton<DnsProviderFactory>();
+        services.AddSingleton<IDnsProviderFactory>(sp => sp.GetRequiredService<DnsProviderFactory>());
 
         return services;
     }
