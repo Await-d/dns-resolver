@@ -5,7 +5,8 @@ const API_BASE = '/api/v1/dns';
 export async function fetchIsps(): Promise<IspInfo[]> {
   const response = await fetch(`${API_BASE}/isps`);
   if (!response.ok) throw new Error('Failed to fetch ISPs');
-  return response.json();
+  const data: ApiResponse<IspInfo[]> = await response.json();
+  return data.data;
 }
 
 export async function resolveOnce(
