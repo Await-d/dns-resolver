@@ -10,6 +10,11 @@ public class Dynv6Provider : BaseDnsProvider
 
     public override string Name => "dynv6";
     public override string DisplayName => "Dynv6";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: null,
+        SecretLabel: "Token",
+        HelpUrl: "https://dynv6.com/keys"
+    );
 
     public Dynv6Provider(HttpClient httpClient) : base(httpClient) { }
 

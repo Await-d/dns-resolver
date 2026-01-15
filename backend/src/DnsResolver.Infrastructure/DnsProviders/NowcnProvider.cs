@@ -9,6 +9,11 @@ public class NowcnProvider : BaseDnsProvider
 
     public override string Name => "nowcn";
     public override string DisplayName => "时代互联";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "auth-userid",
+        SecretLabel: "api-key",
+        HelpUrl: "https://www.now.cn/"
+    );
 
     public NowcnProvider(HttpClient httpClient) : base(httpClient) { }
 

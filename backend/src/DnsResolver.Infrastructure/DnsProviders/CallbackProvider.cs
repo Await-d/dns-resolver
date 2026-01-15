@@ -8,6 +8,11 @@ public class CallbackProvider : BaseDnsProvider
 {
     public override string Name => "callback";
     public override string DisplayName => "自定义回调";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "URL",
+        SecretLabel: "RequestBody",
+        HelpText: "支持变量 #{ip}, #{domain}, #{recordType}, #{ttl}"
+    );
 
     public CallbackProvider(HttpClient httpClient) : base(httpClient) { }
 

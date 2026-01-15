@@ -1,6 +1,15 @@
+export interface ProviderFieldMeta {
+  idLabel: string | null;
+  secretLabel: string | null;
+  extParamLabel: string | null;
+  helpUrl: string | null;
+  helpText: string | null;
+}
+
 export interface ProviderInfo {
   name: string;
   displayName: string;
+  fieldMeta: ProviderFieldMeta;
 }
 
 export interface ProviderCredentials {

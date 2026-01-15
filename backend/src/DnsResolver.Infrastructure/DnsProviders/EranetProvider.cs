@@ -8,7 +8,12 @@ public class EranetProvider : BaseDnsProvider
     private const string Endpoint = "https://api.eranet.com";
 
     public override string Name => "eranet";
-    public override string DisplayName => "Eranet (时代互联国际)";
+    public override string DisplayName => "Eranet";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "auth-userid",
+        SecretLabel: "api-key",
+        HelpUrl: "https://partner.eranet.com/admin/mode_Http_Api_detail.php"
+    );
 
     public EranetProvider(HttpClient httpClient) : base(httpClient) { }
 

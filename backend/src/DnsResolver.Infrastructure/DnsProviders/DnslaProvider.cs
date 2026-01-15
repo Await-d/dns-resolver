@@ -10,6 +10,11 @@ public class DnslaProvider : BaseDnsProvider
 
     public override string Name => "dnsla";
     public override string DisplayName => "DNS.LA";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "APIID",
+        SecretLabel: "API 密钥",
+        HelpUrl: "https://console.dns.la/login?aksk=1"
+    );
 
     public DnslaProvider(HttpClient httpClient) : base(httpClient) { }
 

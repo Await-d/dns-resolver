@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Layout from '../components/Layout';
 import { useProviders, useDomains, useRecords, useAddRecord, useUpdateRecord, useDeleteRecord } from '../hooks/useProvider';
-import type { ProviderCredentials, DnsRecordInfo } from '../types/provider';
+import type { ProviderCredentials, DnsRecordInfo, ProviderFieldMeta } from '../types/provider';
 import { RECORD_TYPES } from '../types/dns';
 
 export default function DnsManagePage() {
@@ -13,6 +13,19 @@ export default function DnsManagePage() {
   const [selectedDomain, setSelectedDomain] = useState<string>('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingRecord, setEditingRecord] = useState<DnsRecordInfo | null>(null);
+
+  // 获取当前选中服务商的字段元数据
+  const selectedProvider = useMemo(() => {
+    return providers.find(p => p.name === credentials?.providerName);
+  }, [providers, credentials?.providerName]);
+
+  const fieldMeta: ProviderFieldMeta = selectedProvider?.fieldMeta ?? {
+    idLabel: null,
+    secretLabel: null,
+    extParamLabel: null,
+    helpUrl: null,
+    helpText: null,
+  };
 
   const { data: domains = [], isLoading: loadingDomains, refetch: refetchDomains } = useDomains(credentials);
   const recordsRequest = credentials && selectedDomain ? { ...credentials, domain: selectedDomain } : null;
@@ -28,8 +41,14 @@ export default function DnsManagePage() {
     }
   }, [domains, selectedDomain]);
 
+  // 当服务商变化时，检查是否需要 ID 字段
+  const needsIdField = fieldMeta.idLabel !== null;
+
   const handleConnect = () => {
-    if (credentials?.providerName && credentials?.id && credentials?.secret) {
+    const hasRequiredFields = credentials?.providerName &&
+      (needsIdField ? credentials?.id : true) &&
+      credentials?.secret;
+    if (hasRequiredFields) {
       refetchDomains();
     }
   };
@@ -96,7 +115,7 @@ export default function DnsManagePage() {
             <select
               className="cyber-input w-full"
               value={credentials?.providerName || ''}
-              onChange={(e) => setCredentials(prev => ({ ...prev!, providerName: e.target.value }))}
+              onChange={(e) => setCredentials(prev => ({ ...prev!, providerName: e.target.value, id: '', secret: '' }))}
               disabled={loadingProviders}
             >
               <option value="">{t('dnsManage.selectProvider')}</option>
@@ -106,38 +125,64 @@ export default function DnsManagePage() {
             </select>
           </div>
 
-          <div>
-            <label className="block text-xs text-[var(--text-muted)] mb-1">{t('dnsManage.apiId')}</label>
-            <input
-              type="text"
-              className="cyber-input w-full"
-              placeholder="Access Key / API ID"
-              value={credentials?.id || ''}
-              onChange={(e) => setCredentials(prev => ({ ...prev!, id: e.target.value }))}
-            />
-          </div>
+          {needsIdField && (
+            <div>
+              <label className="block text-xs text-[var(--text-muted)] mb-1">
+                {fieldMeta.idLabel || t('dnsManage.apiId')}
+              </label>
+              <input
+                type="text"
+                className="cyber-input w-full"
+                placeholder={fieldMeta.idLabel || 'Access Key / API ID'}
+                value={credentials?.id || ''}
+                onChange={(e) => setCredentials(prev => ({ ...prev!, id: e.target.value }))}
+              />
+            </div>
+          )}
 
           <div>
-            <label className="block text-xs text-[var(--text-muted)] mb-1">{t('dnsManage.apiSecret')}</label>
+            <label className="block text-xs text-[var(--text-muted)] mb-1">
+              {fieldMeta.secretLabel || t('dnsManage.apiSecret')}
+            </label>
             <input
               type="password"
               className="cyber-input w-full"
-              placeholder="Secret Key / API Token"
+              placeholder={fieldMeta.secretLabel || 'Secret Key / API Token'}
               value={credentials?.secret || ''}
               onChange={(e) => setCredentials(prev => ({ ...prev!, secret: e.target.value }))}
             />
           </div>
 
-          <div className="flex items-end">
+          <div className="flex items-end gap-2">
             <button
-              className="cyber-btn cyber-btn-primary w-full"
+              className="cyber-btn cyber-btn-primary flex-1"
               onClick={handleConnect}
-              disabled={!credentials?.providerName || !credentials?.id || !credentials?.secret || loadingDomains}
+              disabled={!credentials?.providerName || (needsIdField && !credentials?.id) || !credentials?.secret || loadingDomains}
             >
               {loadingDomains ? t('common.loading') : t('dnsManage.connect')}
             </button>
+            {fieldMeta.helpUrl && (
+              <a
+                href={fieldMeta.helpUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cyber-btn flex items-center justify-center px-3"
+                title={t('common.help') || 'Help'}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </a>
+            )}
           </div>
         </div>
+
+        {/* 帮助提示 */}
+        {fieldMeta.helpText && (
+          <p className="mt-3 text-xs text-[var(--text-muted)]">
+            <span className="text-[var(--neon-orange)]">*</span> {fieldMeta.helpText}
+          </p>
+        )}
       </div>
 
       {/* Domain Selection */}

@@ -11,6 +11,12 @@ public class VercelProvider : BaseDnsProvider
 
     public override string Name => "vercel";
     public override string DisplayName => "Vercel";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: null,
+        SecretLabel: "Token",
+        ExtParamLabel: "Team ID",
+        HelpUrl: "https://vercel.com/account/tokens"
+    );
 
     public VercelProvider(HttpClient httpClient) : base(httpClient) { }
 

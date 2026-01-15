@@ -13,6 +13,11 @@ public class AlidnsProvider : BaseDnsProvider
 
     public override string Name => "alidns";
     public override string DisplayName => "阿里云 DNS";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "AccessKey ID",
+        SecretLabel: "AccessKey Secret",
+        HelpUrl: "https://ram.console.aliyun.com/manage/ak"
+    );
 
     public AlidnsProvider(HttpClient httpClient) : base(httpClient) { }
 

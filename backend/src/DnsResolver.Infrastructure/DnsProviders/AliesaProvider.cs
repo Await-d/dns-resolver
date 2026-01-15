@@ -12,6 +12,11 @@ public class AliesaProvider : BaseDnsProvider
 
     public override string Name => "aliesa";
     public override string DisplayName => "阿里云 ESA";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "AccessKey ID",
+        SecretLabel: "AccessKey Secret",
+        HelpUrl: "https://ram.console.aliyun.com/manage/ak"
+    );
 
     public AliesaProvider(HttpClient httpClient) : base(httpClient) { }
 

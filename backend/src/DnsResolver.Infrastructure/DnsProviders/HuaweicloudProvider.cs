@@ -11,6 +11,11 @@ public class HuaweicloudProvider : BaseDnsProvider
 
     public override string Name => "huaweicloud";
     public override string DisplayName => "华为云 DNS";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "Access Key Id",
+        SecretLabel: "Secret Access Key",
+        HelpUrl: "https://console.huaweicloud.com/iam/#/mine/accessKey"
+    );
 
     public HuaweicloudProvider(HttpClient httpClient) : base(httpClient) { }
 

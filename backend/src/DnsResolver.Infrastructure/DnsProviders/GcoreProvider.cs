@@ -10,6 +10,11 @@ public class GcoreProvider : BaseDnsProvider
 
     public override string Name => "gcore";
     public override string DisplayName => "Gcore";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: null,
+        SecretLabel: "API Token",
+        HelpUrl: "https://portal.gcore.com/accounts/profile/api-tokens/create"
+    );
 
     public GcoreProvider(HttpClient httpClient) : base(httpClient) { }
 

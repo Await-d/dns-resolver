@@ -10,6 +10,11 @@ public class DnspodProvider : BaseDnsProvider
 
     public override string Name => "dnspod";
     public override string DisplayName => "DNSPod";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "ID",
+        SecretLabel: "Token",
+        HelpUrl: "https://console.dnspod.cn/account/token/token"
+    );
 
     public DnspodProvider(HttpClient httpClient) : base(httpClient) { }
 

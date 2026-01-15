@@ -64,7 +64,7 @@ public class DnsProviderFactory : IDnsProviderFactory
         {
             var provider = _serviceProvider.GetService(type) as IDnsProvider;
             if (provider != null)
-                yield return new DnsProviderInfo(name, name, provider.DisplayName);
+                yield return new DnsProviderInfo(name, name, provider.DisplayName, provider.FieldMeta);
         }
     }
 }

@@ -9,6 +9,11 @@ public class DynadotProvider : BaseDnsProvider
 
     public override string Name => "dynadot";
     public override string DisplayName => "Dynadot";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: null,
+        SecretLabel: "API Key",
+        HelpUrl: "https://www.dynadot.com/community/help/question/enable-DDNS"
+    );
 
     public DynadotProvider(HttpClient httpClient) : base(httpClient) { }
 

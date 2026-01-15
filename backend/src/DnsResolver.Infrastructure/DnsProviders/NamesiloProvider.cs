@@ -11,6 +11,12 @@ public class NamesiloProvider : BaseDnsProvider
 
     public override string Name => "namesilo";
     public override string DisplayName => "NameSilo";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: null,
+        SecretLabel: "API Key",
+        HelpUrl: "https://www.namesilo.com/account/api-manager",
+        HelpText: "NameSilo 的 TTL 最低 1 小时"
+    );
 
     public NamesiloProvider(HttpClient httpClient) : base(httpClient) { }
 

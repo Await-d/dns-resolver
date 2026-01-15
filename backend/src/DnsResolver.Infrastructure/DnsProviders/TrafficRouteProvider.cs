@@ -8,7 +8,12 @@ public class TrafficRouteProvider : BaseDnsProvider
     private const string Endpoint = "https://api.dnspod.cn";
 
     public override string Name => "trafficroute";
-    public override string DisplayName => "腾讯云 TrafficRoute";
+    public override string DisplayName => "火山引擎";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "AccessKey",
+        SecretLabel: "SecretAccessKey",
+        HelpUrl: "https://console.volcengine.com/iam/keymanage/"
+    );
 
     public TrafficRouteProvider(HttpClient httpClient) : base(httpClient) { }
 

@@ -11,6 +11,11 @@ public class CloudflareProvider : BaseDnsProvider
 
     public override string Name => "cloudflare";
     public override string DisplayName => "Cloudflare";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: null,
+        SecretLabel: "API Token",
+        HelpUrl: "https://dash.cloudflare.com/profile/api-tokens"
+    );
 
     public CloudflareProvider(HttpClient httpClient) : base(httpClient) { }
 

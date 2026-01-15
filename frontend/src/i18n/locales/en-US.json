@@ -94,7 +94,8 @@
     "seconds": "seconds",
     "refresh": "Refresh",
     "create": "Create",
-    "actions": "Actions"
+    "actions": "Actions",
+    "help": "Help"
   },
   "nav": {
     "menu": "Menu",

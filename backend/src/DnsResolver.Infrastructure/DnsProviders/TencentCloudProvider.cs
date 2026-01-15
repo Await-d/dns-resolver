@@ -13,6 +13,11 @@ public class TencentCloudProvider : BaseDnsProvider
 
     public override string Name => "tencentcloud";
     public override string DisplayName => "腾讯云 DNS";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "SecretId",
+        SecretLabel: "SecretKey",
+        HelpUrl: "https://console.dnspod.cn/account/token/apikey"
+    );
 
     public TencentCloudProvider(HttpClient httpClient) : base(httpClient) { }
 

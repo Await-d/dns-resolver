@@ -17,6 +17,7 @@ public abstract class BaseDnsProvider : IDnsProvider
 
     public abstract string Name { get; }
     public abstract string DisplayName { get; }
+    public abstract DnsProviderFieldMeta FieldMeta { get; }
 
     protected BaseDnsProvider(HttpClient httpClient) => HttpClient = httpClient;
 

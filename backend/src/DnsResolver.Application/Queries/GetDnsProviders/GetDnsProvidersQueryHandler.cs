@@ -15,7 +15,18 @@ public class GetDnsProvidersQueryHandler
     public Task<IReadOnlyList<DnsProviderInfoDto>> HandleAsync(CancellationToken cancellationToken = default)
     {
         var providers = _factory.GetProviderInfos()
-            .Select(p => new DnsProviderInfoDto(p.Id, p.Name, p.DisplayName))
+            .Select(p => new DnsProviderInfoDto(
+                p.Id,
+                p.Name,
+                p.DisplayName,
+                new DnsProviderFieldMetaDto(
+                    p.FieldMeta.IdLabel,
+                    p.FieldMeta.SecretLabel,
+                    p.FieldMeta.ExtParamLabel,
+                    p.FieldMeta.HelpUrl,
+                    p.FieldMeta.HelpText
+                )
+            ))
             .OrderBy(p => p.DisplayName)
             .ToList();
 

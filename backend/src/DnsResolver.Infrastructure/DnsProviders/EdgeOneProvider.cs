@@ -10,6 +10,11 @@ public class EdgeOneProvider : BaseDnsProvider
 
     public override string Name => "edgeone";
     public override string DisplayName => "腾讯 EdgeOne";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "SecretId",
+        SecretLabel: "SecretKey",
+        HelpUrl: "https://console.cloud.tencent.com/cam/capi"
+    );
 
     public EdgeOneProvider(HttpClient httpClient) : base(httpClient) { }
 

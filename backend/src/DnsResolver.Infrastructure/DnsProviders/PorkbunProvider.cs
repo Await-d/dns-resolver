@@ -10,6 +10,11 @@ public class PorkbunProvider : BaseDnsProvider
 
     public override string Name => "porkbun";
     public override string DisplayName => "Porkbun";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "API Key",
+        SecretLabel: "Secret Key",
+        HelpUrl: "https://porkbun.com/account/api"
+    );
 
     public PorkbunProvider(HttpClient httpClient) : base(httpClient) { }
 

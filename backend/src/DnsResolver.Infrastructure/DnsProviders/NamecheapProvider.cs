@@ -11,6 +11,12 @@ public class NamecheapProvider : BaseDnsProvider
 
     public override string Name => "namecheap";
     public override string DisplayName => "Namecheap";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: null,
+        SecretLabel: "Password",
+        HelpUrl: "https://www.namecheap.com/support/knowledgebase/article.aspx/36/11/how-do-i-start-using-dynamic-dns/",
+        HelpText: "Namecheap DDNS 不支持更新 IPv6"
+    );
 
     public NamecheapProvider(HttpClient httpClient) : base(httpClient) { }
 

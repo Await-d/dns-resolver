@@ -9,7 +9,12 @@ public class NSOneProvider : BaseDnsProvider
     private const string Endpoint = "https://api.nsone.net/v1";
 
     public override string Name => "nsone";
-    public override string DisplayName => "NS1";
+    public override string DisplayName => "IBM NS1 Connect";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: null,
+        SecretLabel: "API Key",
+        HelpUrl: "https://my.nsone.net/#/account/settings/keys"
+    );
 
     public NSOneProvider(HttpClient httpClient) : base(httpClient) { }
 

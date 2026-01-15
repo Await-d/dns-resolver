@@ -11,6 +11,11 @@ public class BaiduCloudProvider : BaseDnsProvider
 
     public override string Name => "baiducloud";
     public override string DisplayName => "百度云 DNS";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "AccessKey ID",
+        SecretLabel: "AccessKey Secret",
+        HelpUrl: "https://console.bce.baidu.com/iam/#/iam/accesslist"
+    );
 
     public BaiduCloudProvider(HttpClient httpClient) : base(httpClient) { }
 

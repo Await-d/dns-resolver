@@ -6,6 +6,7 @@ public interface IDnsProvider
 {
     string Name { get; }
     string DisplayName { get; }
+    DnsProviderFieldMeta FieldMeta { get; }
 
     void Configure(DnsProviderConfig config);
 

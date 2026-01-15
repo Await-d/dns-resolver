@@ -11,6 +11,12 @@ public class GodaddyProvider : BaseDnsProvider
 
     public override string Name => "godaddy";
     public override string DisplayName => "GoDaddy";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "Key",
+        SecretLabel: "Secret",
+        HelpUrl: "https://developer.godaddy.com/keys",
+        HelpText: "GoDaddy 需要拥有 10 个及以上的域名或 Pro Plan 才可以使用 API"
+    );
 
     public GodaddyProvider(HttpClient httpClient) : base(httpClient) { }
 

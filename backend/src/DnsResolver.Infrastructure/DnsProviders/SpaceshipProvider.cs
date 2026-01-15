@@ -10,6 +10,11 @@ public class SpaceshipProvider : BaseDnsProvider
 
     public override string Name => "spaceship";
     public override string DisplayName => "Spaceship";
+    public override DnsProviderFieldMeta FieldMeta => new(
+        IdLabel: "API Key",
+        SecretLabel: "API Secret",
+        HelpUrl: "https://www.spaceship.com/application/api-manager/"
+    );
 
     public SpaceshipProvider(HttpClient httpClient) : base(httpClient) { }
 
