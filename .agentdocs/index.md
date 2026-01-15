@@ -37,11 +37,13 @@ dns-resolver/
 
 ## 当前任务文档
 
-- `workflow/260115-数据持久化.md` - 将内存存储改为 SQLite 持久化
+（无进行中的任务）
 
 ---
 
 ## 已完成任务
+
+- `workflow/260115-数据持久化.md` - 将内存存储改为 SQLite 持久化 ✅
 
 - `workflow/done/260115-ddns前端页面.md` - DDNS 动态域名管理前端页面 ✅
 - `workflow/done/260114-项目完善.md` - 测试、部署、文档、功能增强 ✅
