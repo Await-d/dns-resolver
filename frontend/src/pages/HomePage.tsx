@@ -1,28 +1,40 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import MobileBottomNav from '../components/MobileBottomNav';
 import DnsQueryForm from '../components/DnsQueryForm';
 import IspSelector from '../components/IspSelector';
 import ResultTable from '../components/ResultTable';
-import { useIsps, useDnsCompare } from '../hooks/useDnsQuery';
-import type { RecordType, ResolveResult } from '../types/dns';
+import { useDnsCompare } from '../hooks/useDnsQuery';
+import { useUserProviderConfigs } from '../hooks/useUserProvider';
+import type { RecordType, ResolveResult, IspInfo } from '../types/dns';
 
 export default function HomePage() {
   const { t } = useTranslation();
 
-  const { data: isps = [], isLoading: isLoadingIsps } = useIsps();
+  // 使用用户配置的服务商列表
+  const { data: userConfigs = [], isLoading: isLoadingConfigs } = useUserProviderConfigs();
   const { mutate: compare, isPending } = useDnsCompare();
+
+  // 将用户配置转换为 IspInfo 格式
+  const configuredProviders: IspInfo[] = userConfigs
+    .filter(c => c.isActive)
+    .map(c => ({
+      id: c.providerName,
+      name: c.providerName,
+      displayName: c.displayName,
+    }));
 
   const [mobileActiveTab, setMobileActiveTab] = useState<'query' | 'providers' | 'results'>('query');
   const [selectedIsps, setSelectedIsps] = useState<string[]>([]);
   const [results, setResults] = useState<ResolveResult[]>([]);
 
   useEffect(() => {
-    if (isps.length > 0 && selectedIsps.length === 0) {
-      setSelectedIsps(isps.slice(0, 4).map(isp => isp.id));
+    if (configuredProviders.length > 0 && selectedIsps.length === 0) {
+      setSelectedIsps(configuredProviders.slice(0, 4).map(p => p.id));
     }
-  }, [isps, selectedIsps.length]);
+  }, [configuredProviders.length, selectedIsps.length]);
 
   const handleSubmit = (domain: string, recordType: RecordType) => {
     if (selectedIsps.length === 0) {
@@ -68,6 +80,29 @@ export default function HomePage() {
       return newResults;
     });
   };
+
+  // 未配置服务商时显示提示
+  const renderNoProvidersHint = () => (
+    <div className="py-12 text-center">
+      <div className="w-16 h-16 mx-auto mb-4 border-2 border-dashed border-[var(--border-color)] flex items-center justify-center">
+        <svg className="w-8 h-8 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+      </div>
+      <p className="text-sm text-[var(--text-secondary)] mb-2">{t('providers.noConfigured')}</p>
+      <p className="text-xs text-[var(--text-muted)] mb-4">{t('providers.noConfiguredHint')}</p>
+      <Link
+        to="/manage"
+        className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--neon-cyan-dim)] border border-[var(--neon-cyan)] text-[var(--neon-cyan)] text-sm hover:bg-[var(--neon-cyan)] hover:text-[var(--bg-primary)] transition-all"
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        {t('providers.goToConfig')}
+      </Link>
+    </div>
+  );
 
   return (
     <Layout>
@@ -141,17 +176,19 @@ export default function HomePage() {
               </h2>
               <div className="flex-1"></div>
               <span className="text-xs text-[var(--text-muted)]">
-                {selectedIsps.length} / {isps.length} {t('providers.selected')}
+                {selectedIsps.length} / {configuredProviders.length} {t('providers.selected')}
               </span>
             </div>
-            {isLoadingIsps ? (
+            {isLoadingConfigs ? (
               <div className="py-6">
                 <div className="loading-bar mb-3"></div>
                 <p className="text-center text-[var(--text-muted)] text-sm">{t('common.loading')}</p>
               </div>
+            ) : configuredProviders.length === 0 ? (
+              renderNoProvidersHint()
             ) : (
               <IspSelector
-                isps={isps}
+                isps={configuredProviders}
                 selectedIsps={selectedIsps}
                 onChange={setSelectedIsps}
                 disabled={isPending}
@@ -237,17 +274,19 @@ export default function HomePage() {
                   </h2>
                 </div>
                 <span className="text-[10px] text-[var(--text-muted)]">
-                  {selectedIsps.length}/{isps.length}
+                  {selectedIsps.length}/{configuredProviders.length}
                 </span>
               </div>
-              {isLoadingIsps ? (
+              {isLoadingConfigs ? (
                 <div className="py-6">
                   <div className="loading-bar mb-3"></div>
                   <p className="text-center text-[var(--text-muted)] text-sm">{t('common.loading')}</p>
                 </div>
+              ) : configuredProviders.length === 0 ? (
+                renderNoProvidersHint()
               ) : (
                 <IspSelector
-                  isps={isps}
+                  isps={configuredProviders}
                   selectedIsps={selectedIsps}
                   onChange={setSelectedIsps}
                   disabled={isPending}

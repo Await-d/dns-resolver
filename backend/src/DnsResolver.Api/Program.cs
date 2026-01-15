@@ -10,6 +10,7 @@ using DnsResolver.Application.Services;
 using DnsResolver.Domain.Aggregates.IspProvider;
 using DnsResolver.Domain.Aggregates.DdnsTask;
 using DnsResolver.Domain.Aggregates.User;
+using DnsResolver.Domain.Aggregates.UserProviderConfig;
 using DnsResolver.Domain.Services;
 using DnsResolver.Infrastructure.Configuration;
 using DnsResolver.Infrastructure.Data;
@@ -127,6 +128,7 @@ builder.Services.AddSingleton<IDnsResolutionService, DnsClientAdapter>();
 // User & Authentication services
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IUserRepository, EfUserRepository>();
+builder.Services.AddScoped<IUserProviderConfigRepository, EfUserProviderConfigRepository>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 // Auth handlers

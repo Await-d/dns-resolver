@@ -49,7 +49,10 @@
     "selected": "已选择",
     "available": "可用DNS服务器",
     "selectAll": "全选",
-    "deselectAll": "取消全选"
+    "deselectAll": "取消全选",
+    "noConfigured": "暂无已配置的服务商",
+    "noConfiguredHint": "请先在 DNS 管理页面配置服务商凭证",
+    "goToConfig": "前往配置"
   },
   "results": {
     "title": "解析结果",

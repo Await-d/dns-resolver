@@ -49,7 +49,10 @@
     "selected": "Selected",
     "available": "Available DNS Servers",
     "selectAll": "Select All",
-    "deselectAll": "Deselect All"
+    "deselectAll": "Deselect All",
+    "noConfigured": "No providers configured",
+    "noConfiguredHint": "Please configure provider credentials in DNS Management first",
+    "goToConfig": "Go to Config"
   },
   "results": {
     "title": "Analysis Results",
