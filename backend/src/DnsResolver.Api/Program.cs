@@ -11,12 +11,14 @@ using DnsResolver.Domain.Aggregates.DdnsTask;
 using DnsResolver.Domain.Aggregates.User;
 using DnsResolver.Domain.Services;
 using DnsResolver.Infrastructure.Configuration;
+using DnsResolver.Infrastructure.Data;
 using DnsResolver.Infrastructure.DnsClient;
 using DnsResolver.Infrastructure.Repositories;
 using DnsResolver.Infrastructure.DnsProviders;
 using DnsResolver.Infrastructure.BackgroundServices;
 using DnsResolver.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -107,14 +109,23 @@ builder.Services.AddAuthorization();
 // Configuration
 builder.Services.Configure<DnsSettings>(builder.Configuration.GetSection("DnsSettings"));
 
+// Database (SQLite)
+var dataDir = Path.Combine(builder.Environment.ContentRootPath, "data");
+Directory.CreateDirectory(dataDir);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? $"Data Source={Path.Combine(dataDir, "dns-resolver.db")}";
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite(connectionString));
+
 // Domain & Infrastructure services
 builder.Services.AddSingleton<IIspProviderRepository, InMemoryIspProviderRepository>();
-builder.Services.AddSingleton<IDdnsTaskRepository, InMemoryDdnsTaskRepository>();
+builder.Services.AddScoped<IDdnsTaskRepository, EfDdnsTaskRepository>();
 builder.Services.AddSingleton<IDnsResolutionService, DnsClientAdapter>();
 
 // User & Authentication services
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
-builder.Services.AddSingleton<IUserRepository, InMemoryUserRepository>();
+builder.Services.AddScoped<IUserRepository, EfUserRepository>();
 builder.Services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
 // Auth handlers
@@ -153,6 +164,9 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Initialize database
+await DbInitializer.InitializeAsync(app.Services);
 
 // Middleware pipeline
 app.UseMiddleware<ExceptionMiddleware>();
