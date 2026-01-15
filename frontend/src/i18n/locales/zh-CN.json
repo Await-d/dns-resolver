@@ -1,0 +1,151 @@
+{
+  "app": {
+    "title": "DNS Resolver",
+    "subtitle": "多运营商域名解析终端",
+    "version": "v1.0",
+    "footer": "基于先进DNS技术"
+  },
+  "header": {
+    "systemOnline": "系统在线",
+    "logout": "退出登录",
+    "switchProvider": "切换配置"
+  },
+  "login": {
+    "title": "系统登录",
+    "subtitle": "DNS解析管理平台",
+    "username": "用户名",
+    "usernamePlaceholder": "请输入用户名",
+    "password": "密码",
+    "passwordPlaceholder": "请输入密码",
+    "rememberMe": "记住登录状态",
+    "submit": "登录系统",
+    "submitting": "验证中...",
+    "error": "用户名或密码错误",
+    "welcome": "欢迎使用DNS解析系统",
+    "secureAccess": "安全访问 · 加密传输"
+  },
+  "provider": {
+    "title": "选择配置商",
+    "subtitle": "切换不同的DNS服务配置",
+    "current": "当前配置",
+    "available": "可用配置",
+    "unavailable": "暂不可用",
+    "ispCount": "{{count}} 个DNS服务器",
+    "switch": "切换",
+    "active": "使用中"
+  },
+  "query": {
+    "title": "查询接口",
+    "domain": "目标域名",
+    "domainPlaceholder": "example.com",
+    "recordType": "记录类型",
+    "execute": "执行查询",
+    "resolving": "解析中",
+    "tip": "输入域名时无需添加协议前缀",
+    "commonTypes": "常用类型"
+  },
+  "providers": {
+    "title": "DNS服务商",
+    "selected": "已选择",
+    "available": "可用DNS服务器",
+    "selectAll": "全选",
+    "deselectAll": "取消全选"
+  },
+  "results": {
+    "title": "解析结果",
+    "stats": "统计数据",
+    "totalQueries": "查询总数",
+    "success": "成功",
+    "avgTime": "平均耗时",
+    "domain": "域名",
+    "provider": "服务商",
+    "resolution": "解析结果",
+    "ttl": "TTL",
+    "latency": "延迟",
+    "status": "状态",
+    "online": "在线",
+    "failed": "失败",
+    "noRecords": "无记录",
+    "noData": "暂无数据",
+    "noDataHint": "输入域名并选择服务商开始解析",
+    "queryTime": "查询完成于",
+    "doubleClickEdit": "双击可编辑",
+    "edit": "编辑",
+    "legend": {
+      "fast": "<50ms",
+      "medium": "50-150ms",
+      "slow": ">150ms"
+    }
+  },
+  "common": {
+    "loading": "加载中",
+    "error": "错误",
+    "confirm": "确认",
+    "cancel": "取消",
+    "save": "保存",
+    "close": "关闭",
+    "sec": "秒",
+    "ms": "毫秒",
+    "edit": "编辑",
+    "delete": "删除",
+    "seconds": "秒",
+    "refresh": "刷新",
+    "create": "创建",
+    "actions": "操作"
+  },
+  "nav": {
+    "dnsQuery": "DNS 查询",
+    "dnsManage": "DNS 管理",
+    "ddns": "DDNS 动态域名"
+  },
+  "dnsManage": {
+    "providerConfig": "服务商配置",
+    "provider": "DNS 服务商",
+    "selectProvider": "选择服务商",
+    "apiId": "API ID / Access Key",
+    "apiSecret": "API Secret / Token",
+    "connect": "连接",
+    "domains": "域名列表",
+    "records": "DNS 记录",
+    "addRecord": "添加记录",
+    "editRecord": "编辑记录",
+    "noRecords": "暂无 DNS 记录",
+    "subDomain": "子域名",
+    "type": "类型",
+    "value": "记录值",
+    "actions": "操作",
+    "confirmDelete": "确定要删除这条记录吗？"
+  },
+  "language": {
+    "zh-CN": "简体中文",
+    "en-US": "English"
+  },
+  "ddns": {
+    "currentIp": "当前公网 IP",
+    "publicIp": "公网 IP 地址",
+    "ipSource": "IP 来源",
+    "tasks": "DDNS 任务",
+    "addTask": "添加任务",
+    "createTask": "创建 DDNS 任务",
+    "noTasks": "暂无 DDNS 任务",
+    "taskName": "任务名称",
+    "taskNamePlaceholder": "例如：家庭宽带",
+    "provider": "DNS 服务商",
+    "selectProvider": "选择服务商",
+    "domain": "主域名",
+    "subDomain": "子域名",
+    "recordId": "记录 ID",
+    "recordIdPlaceholder": "DNS 记录的唯一标识",
+    "lastIp": "最后 IP",
+    "lastUpdate": "最后更新",
+    "status": "状态",
+    "enabled": "已启用",
+    "disabled": "已禁用",
+    "interval": "检查间隔",
+    "minutes": "分钟",
+    "seconds": "秒",
+    "hasError": "有错误",
+    "fillRequired": "请填写所有必填项",
+    "confirmDelete": "确定要删除这个 DDNS 任务吗？"
+  }
+}

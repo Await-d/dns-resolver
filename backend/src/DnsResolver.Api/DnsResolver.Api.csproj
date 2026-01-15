@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DnsResolver.Application\DnsResolver.Application.csproj" />
+    <ProjectReference Include="..\DnsResolver.Infrastructure\DnsResolver.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
