@@ -22,12 +22,22 @@ public class DnsProviderController : ControllerBase
     /// 获取所有支持的 DNS 服务商列表
     /// </summary>
     [HttpGet]
-    public ActionResult<ApiResponse<IEnumerable<ProviderInfo>>> GetProviders()
+    public ActionResult<ApiResponse<IEnumerable<ProviderInfoResponse>>> GetProviders()
     {
         var providers = _providerFactory.GetProviderInfos()
-            .Select(p => new ProviderInfo(p.Name, p.DisplayName))
+            .Select(p => new ProviderInfoResponse(
+                p.Name,
+                p.DisplayName,
+                new ProviderFieldMetaResponse(
+                    p.FieldMeta.IdLabel,
+                    p.FieldMeta.SecretLabel,
+                    p.FieldMeta.ExtParamLabel,
+                    p.FieldMeta.HelpUrl,
+                    p.FieldMeta.HelpText
+                )
+            ))
             .ToList();
-        return Ok(ApiResponse<IEnumerable<ProviderInfo>>.Ok(providers));
+        return Ok(ApiResponse<IEnumerable<ProviderInfoResponse>>.Ok(providers));
     }
 
     /// <summary>
@@ -235,7 +245,14 @@ public class DnsProviderController : ControllerBase
     }
 }
 
-public record ProviderInfo(string Name, string DisplayName);
+public record ProviderInfoResponse(string Name, string DisplayName, ProviderFieldMetaResponse FieldMeta);
+public record ProviderFieldMetaResponse(
+    string? IdLabel,
+    string? SecretLabel,
+    string? ExtParamLabel,
+    string? HelpUrl,
+    string? HelpText
+);
 
 // Extended request types with credentials
 public record GetRecordsWithCredentialsRequest(
