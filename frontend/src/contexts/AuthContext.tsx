@@ -1,55 +1,38 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User, ConfigProvider, AuthState, LoginCredentials } from '../types/auth';
+import type { IspInfo } from '../types/dns';
 import { authApi } from '../services/authApi';
+import { fetchIsps } from '../services/dnsApi';
 
-// Mock config providers
-const MOCK_PROVIDERS: ConfigProvider[] = [
-  {
-    id: 'china-telecom',
-    name: '中国电信',
-    description: '电信骨干网DNS服务器配置',
-    icon: '📡',
-    color: 'var(--neon-cyan)',
+// ISP 图标和颜色映射
+const ISP_STYLES: Record<string, { icon: string; color: string }> = {
+  telecom: { icon: '📡', color: 'var(--neon-cyan)' },
+  unicom: { icon: '🌐', color: 'var(--neon-green)' },
+  mobile: { icon: '📶', color: 'var(--neon-magenta)' },
+  aliyun: { icon: '☁️', color: 'var(--neon-orange)' },
+  tencent: { icon: '🐧', color: '#00d4ff' },
+  baidu: { icon: '🔍', color: '#2932e1' },
+  google: { icon: '🔎', color: '#4285f4' },
+  cloudflare: { icon: '🛡️', color: '#f38020' },
+  dnspod: { icon: '🌍', color: '#00a4ff' },
+  opendns: { icon: '🔓', color: '#ff6600' },
+  quad9: { icon: '9️⃣', color: '#00a0d6' },
+};
+
+const DEFAULT_STYLE = { icon: '🌐', color: 'var(--neon-cyan)' };
+
+function ispToProvider(isp: IspInfo): ConfigProvider {
+  const style = ISP_STYLES[isp.id] || DEFAULT_STYLE;
+  return {
+    id: isp.id,
+    name: isp.name,
+    description: `${isp.primaryDns}${isp.secondaryDns ? ' / ' + isp.secondaryDns : ''}`,
+    icon: style.icon,
+    color: style.color,
     isActive: true,
-    ispCount: 8
-  },
-  {
-    id: 'china-unicom',
-    name: '中国联通',
-    description: '联通全国DNS节点配置',
-    icon: '🌐',
-    color: 'var(--neon-green)',
-    isActive: true,
-    ispCount: 6
-  },
-  {
-    id: 'china-mobile',
-    name: '中国移动',
-    description: '移动DNS服务配置',
-    icon: '📶',
-    color: 'var(--neon-magenta)',
-    isActive: true,
-    ispCount: 5
-  },
-  {
-    id: 'public-dns',
-    name: '公共DNS',
-    description: '国内外公共DNS服务',
-    icon: '🔓',
-    color: 'var(--neon-orange)',
-    isActive: true,
-    ispCount: 12
-  },
-  {
-    id: 'enterprise',
-    name: '企业专线',
-    description: '企业级DNS解析服务',
-    icon: '🏢',
-    color: '#9d4edd',
-    isActive: false,
-    ispCount: 4
-  }
-];
+    ispCount: isp.secondaryDns ? 2 : 1,
+  };
+}
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<boolean>;
@@ -58,6 +41,7 @@ interface AuthContextType extends AuthState {
   switchProvider: (providerId: string) => void;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   loginError: string | null;
+  isLoadingProviders: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -69,13 +53,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const [loginError, setLoginError] = useState<string | null>(null);
+  const [providers, setProviders] = useState<ConfigProvider[]>([]);
+  const [isLoadingProviders, setIsLoadingProviders] = useState(true);
 
-  const [currentProvider, setCurrentProvider] = useState<ConfigProvider | null>(() => {
-    const savedId = localStorage.getItem('dns_provider');
-    return MOCK_PROVIDERS.find(p => p.id === savedId) || MOCK_PROVIDERS[0];
-  });
+  const [currentProvider, setCurrentProvider] = useState<ConfigProvider | null>(null);
 
-  const [providers] = useState<ConfigProvider[]>(MOCK_PROVIDERS);
+  // 从后端加载 ISP 列表并转换为 ConfigProvider
+  useEffect(() => {
+    const loadProviders = async () => {
+      try {
+        const isps = await fetchIsps();
+        const loadedProviders = isps.map(ispToProvider);
+        setProviders(loadedProviders);
+
+        // 恢复之前选择的配置商，或选择第一个
+        const savedId = localStorage.getItem('dns_provider');
+        const savedProvider = loadedProviders.find(p => p.id === savedId);
+        setCurrentProvider(savedProvider || loadedProviders[0] || null);
+      } catch (error) {
+        console.error('Failed to load ISP providers:', error);
+        setProviders([]);
+      } finally {
+        setIsLoadingProviders(false);
+      }
+    };
+
+    loadProviders();
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -145,6 +149,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         switchProvider,
         changePassword,
         loginError,
+        isLoadingProviders,
       }}
     >
       {children}
