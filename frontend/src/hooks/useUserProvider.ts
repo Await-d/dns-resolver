@@ -6,7 +6,14 @@ import {
   updateProviderConfig,
   deleteProviderConfig,
   toggleProviderConfig,
+  fetchDomainsByConfig,
+  fetchRecordsByConfig,
+  addDnsRecord,
+  updateDnsRecord,
+  deleteDnsRecord,
   type UpdateProviderConfigRequest,
+  type AddDnsRecordRequest,
+  type UpdateDnsRecordRequest,
 } from '../services/userProviderApi';
 
 export function useUserProviderConfigs() {
@@ -64,6 +71,60 @@ export function useToggleProviderConfig() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userProviderConfigs'] });
       queryClient.invalidateQueries({ queryKey: ['availableProviders'] });
+    },
+  });
+}
+
+export function useDomainsByConfig(configId: string | null) {
+  return useQuery({
+    queryKey: ['domainsByConfig', configId],
+    queryFn: () => fetchDomainsByConfig(configId!),
+    enabled: !!configId,
+  });
+}
+
+export function useRecordsByConfig(
+  configId: string | null,
+  domain: string | null,
+  subDomain?: string,
+  recordType?: string
+) {
+  return useQuery({
+    queryKey: ['recordsByConfig', configId, domain, subDomain, recordType],
+    queryFn: () => fetchRecordsByConfig(configId!, domain!, subDomain, recordType),
+    enabled: !!configId && !!domain,
+  });
+}
+
+export function useAddDnsRecord() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ configId, domain, request }: { configId: string; domain: string; request: AddDnsRecordRequest }) =>
+      addDnsRecord(configId, domain, request),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['recordsByConfig', variables.configId, variables.domain] });
+    },
+  });
+}
+
+export function useUpdateDnsRecord() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ configId, domain, recordId, request }: { configId: string; domain: string; recordId: string; request: UpdateDnsRecordRequest }) =>
+      updateDnsRecord(configId, domain, recordId, request),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['recordsByConfig', variables.configId, variables.domain] });
+    },
+  });
+}
+
+export function useDeleteDnsRecord() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ configId, domain, recordId }: { configId: string; domain: string; recordId: string }) =>
+      deleteDnsRecord(configId, domain, recordId),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['recordsByConfig', variables.configId, variables.domain] });
     },
   });
 }

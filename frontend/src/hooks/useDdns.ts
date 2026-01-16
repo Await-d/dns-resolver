@@ -8,13 +8,22 @@ import {
   enableDdnsTask,
   disableDdnsTask,
   updateDdns,
+  fetchIpSources,
 } from '../services/ddnsApi';
 import type { CreateDdnsTaskRequest, UpdateDdnsTaskRequest, DdnsUpdateRequest } from '../types/ddns';
 
-export function useCurrentIp() {
+export function useIpSources() {
   return useQuery({
-    queryKey: ['ddns', 'ip'],
-    queryFn: fetchCurrentIp,
+    queryKey: ['ddns', 'ip-sources'],
+    queryFn: fetchIpSources,
+    staleTime: 1000 * 60 * 60, // Cache for 1 hour
+  });
+}
+
+export function useCurrentIp(source?: string) {
+  return useQuery({
+    queryKey: ['ddns', 'ip', source],
+    queryFn: () => fetchCurrentIp(source),
     refetchInterval: 60000, // Refresh every minute
   });
 }

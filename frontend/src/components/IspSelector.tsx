@@ -6,9 +6,10 @@ interface IspSelectorProps {
   selectedIsps: string[];
   onChange: (selected: string[]) => void;
   disabled?: boolean;
+  compact?: boolean;
 }
 
-export default function IspSelector({ isps, selectedIsps, onChange, disabled }: IspSelectorProps) {
+export default function IspSelector({ isps, selectedIsps, onChange, disabled, compact }: IspSelectorProps) {
   const { t } = useTranslation();
 
   const handleToggle = (ispId: string) => {
@@ -28,6 +29,53 @@ export default function IspSelector({ isps, selectedIsps, onChange, disabled }: 
       onChange(isps.map(isp => isp.id));
     }
   };
+
+  // Compact mode: inline chips without header/summary
+  if (compact) {
+    return (
+      <div className="flex flex-wrap gap-2 items-center">
+        {/* Select All Button - Compact */}
+        <button
+          type="button"
+          onClick={handleSelectAll}
+          disabled={disabled}
+          className={`px-2 py-1 text-[10px] border transition-all disabled:opacity-40 ${
+            selectedIsps.length === isps.length
+              ? 'border-[var(--neon-cyan)] bg-[var(--neon-cyan-dim)] text-[var(--neon-cyan)]'
+              : 'border-[var(--border-color)] text-[var(--text-muted)] hover:border-[var(--neon-cyan)] hover:text-[var(--neon-cyan)]'
+          }`}
+        >
+          {selectedIsps.length === isps.length ? t('providers.deselectAll') : t('providers.selectAll')}
+        </button>
+
+        {/* Divider */}
+        <div className="w-px h-4 bg-[var(--border-color)]"></div>
+
+        {/* ISP Chips - Compact */}
+        {isps.map((isp) => {
+          const isSelected = selectedIsps.includes(isp.id);
+          return (
+            <button
+              key={isp.id}
+              type="button"
+              onClick={() => handleToggle(isp.id)}
+              disabled={disabled}
+              className={`px-2 py-1 text-xs border transition-all disabled:opacity-40 flex items-center gap-1.5 ${
+                isSelected
+                  ? 'border-[var(--neon-cyan)] bg-[var(--neon-cyan-dim)] text-[var(--neon-cyan)]'
+                  : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:border-[var(--neon-cyan)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                isSelected ? 'bg-[var(--neon-cyan)]' : 'bg-[var(--text-muted)]'
+              }`}></span>
+              {isp.displayName || isp.name}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

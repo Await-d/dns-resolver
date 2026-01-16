@@ -54,21 +54,54 @@ interface AuthContextType extends AuthState {
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   loginError: string | null;
   isLoadingProviders: boolean;
+  isInitializing: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('dns_user');
-    return saved ? JSON.parse(saved) : null;
-  });
-
+  const [user, setUser] = useState<User | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [providers, setProviders] = useState<ConfigProvider[]>([]);
   const [isLoadingProviders, setIsLoadingProviders] = useState(true);
-
   const [currentProvider, setCurrentProvider] = useState<ConfigProvider | null>(null);
+
+  // 初始化时验证 token
+  useEffect(() => {
+    const validateToken = async () => {
+      const token = localStorage.getItem('dns_token');
+      const savedUser = localStorage.getItem('dns_user');
+
+      if (!token || !savedUser) {
+        setIsInitializing(false);
+        return;
+      }
+
+      try {
+        // 调用后端验证 token
+        const currentUser = await authApi.getCurrentUser();
+        const parsedUser: User = {
+          id: currentUser.userId,
+          username: currentUser.username,
+          email: `${currentUser.username}@local`,
+          role: currentUser.role as 'admin' | 'user',
+        };
+        setUser(parsedUser);
+        localStorage.setItem('dns_user', JSON.stringify(parsedUser));
+      } catch (error) {
+        // Token 无效，清除本地存储
+        console.error('Token validation failed:', error);
+        localStorage.removeItem('dns_token');
+        localStorage.removeItem('dns_user');
+        setUser(null);
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
+    validateToken();
+  }, []);
 
   // 从后端加载 ISP 列表并转换为 ConfigProvider
   useEffect(() => {
@@ -162,6 +195,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         changePassword,
         loginError,
         isLoadingProviders,
+        isInitializing,
       }}
     >
       {children}

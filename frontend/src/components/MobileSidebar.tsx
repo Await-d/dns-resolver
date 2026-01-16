@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import ChangePasswordModal from './ChangePasswordModal';
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -13,6 +15,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -106,6 +109,19 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           <LanguageSwitcher />
 
           <button
+            onClick={() => {
+              setShowChangePassword(true);
+              onClose();
+            }}
+            className="w-full flex items-center gap-2 p-3 text-[var(--text-secondary)] hover:text-[var(--neon-cyan)] hover:bg-[var(--neon-cyan-dim)] transition-all"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+            </svg>
+            <span className="text-sm">{t('header.changePassword')}</span>
+          </button>
+
+          <button
             onClick={handleLogout}
             className="w-full flex items-center gap-2 p-3 text-[var(--text-secondary)] hover:text-[var(--neon-red)] hover:bg-[var(--neon-red-dim)] transition-all"
           >
@@ -116,6 +132,11 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
           </button>
         </div>
       </aside>
+
+      <ChangePasswordModal
+        isOpen={showChangePassword}
+        onClose={() => setShowChangePassword(false)}
+      />
     </>
   );
 }

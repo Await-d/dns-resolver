@@ -13,7 +13,7 @@ export default function Layout({ children }: LayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen hex-pattern">
+    <div className="h-screen overflow-hidden hex-pattern flex flex-col">
       {/* Desktop Sidebar */}
       <div className="desktop-sidebar hidden md:block">
         <Sidebar
@@ -51,13 +51,13 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Main Content */}
       <div
-        className={`transition-all duration-300 md:ml-64 ${
+        className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 md:ml-64 ${
           sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'
         }`}
       >
         {/* Desktop Top Bar */}
-        <header className="hidden md:block sticky top-0 z-40 bg-[var(--bg-primary)]/90 backdrop-blur-sm border-b border-[var(--border-color)]">
-          <div className="px-6 py-3 flex items-center justify-end">
+        <header className="hidden md:flex flex-shrink-0 z-40 bg-[var(--bg-primary)]/90 backdrop-blur-sm border-b border-[var(--border-color)]">
+          <div className="flex-1 px-6 py-3 flex items-center justify-end">
             <div className="flex items-center gap-2">
               <div className="pulse-dot success"></div>
               <span className="text-[var(--text-secondary)] text-sm">{t('header.systemOnline')}</span>
@@ -66,7 +66,7 @@ export default function Layout({ children }: LayoutProps) {
         </header>
 
         {/* Page Content */}
-        <main className="pb-24 md:pb-6">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden pb-20 md:pb-0">
           {children}
         </main>
       </div>

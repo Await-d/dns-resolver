@@ -1,18 +1,6 @@
+import { get, post, put, del } from './apiClient';
+
 const API_BASE = '/api/v1/user/providers';
-
-interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-}
-
-function getAuthHeaders(): HeadersInit {
-  const token = localStorage.getItem('dns_token');
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-}
 
 export interface UserProviderConfig {
   id: string;
@@ -46,73 +34,93 @@ export interface UpdateProviderConfigRequest {
   extraParams?: Record<string, string>;
 }
 
-export async function fetchUserProviderConfigs(): Promise<UserProviderConfig[]> {
-  const response = await fetch(API_BASE, {
-    headers: getAuthHeaders(),
-  });
-  if (!response.ok) throw new Error('Failed to fetch user provider configs');
-  const data: ApiResponse<UserProviderConfig[]> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data || [];
+export interface DnsRecordInfo {
+  recordId: string;
+  subDomain: string;
+  recordType: string;
+  value: string;
+  ttl: number;
+  status?: string;
 }
 
-export async function fetchAvailableProviders(): Promise<AvailableProvider[]> {
-  const response = await fetch(`${API_BASE}/available`, {
-    headers: getAuthHeaders(),
-  });
-  if (!response.ok) throw new Error('Failed to fetch available providers');
-  const data: ApiResponse<AvailableProvider[]> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data || [];
+export interface AddDnsRecordRequest {
+  subDomain: string;
+  recordType: string;
+  value: string;
+  ttl?: number;
 }
 
-export async function addProviderConfig(request: AddProviderConfigRequest): Promise<UserProviderConfig> {
-  const response = await fetch(API_BASE, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(request),
-  });
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || 'Failed to add provider config');
-  }
-  const data: ApiResponse<UserProviderConfig> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data!;
+export interface UpdateDnsRecordRequest {
+  value: string;
+  ttl?: number;
 }
 
-export async function updateProviderConfig(id: string, request: UpdateProviderConfigRequest): Promise<UserProviderConfig> {
-  const response = await fetch(`${API_BASE}/${id}`, {
-    method: 'PUT',
-    headers: getAuthHeaders(),
-    body: JSON.stringify(request),
-  });
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error || 'Failed to update provider config');
-  }
-  const data: ApiResponse<UserProviderConfig> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data!;
+export function fetchUserProviderConfigs(): Promise<UserProviderConfig[]> {
+  return get<UserProviderConfig[]>(API_BASE);
 }
 
-export async function deleteProviderConfig(id: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/${id}`, {
-    method: 'DELETE',
-    headers: getAuthHeaders(),
-  });
-  if (!response.ok) throw new Error('Failed to delete provider config');
-  const data: ApiResponse<boolean> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
+export function fetchAvailableProviders(): Promise<AvailableProvider[]> {
+  return get<AvailableProvider[]>(`${API_BASE}/available`);
 }
 
-export async function toggleProviderConfig(id: string): Promise<UserProviderConfig> {
-  const response = await fetch(`${API_BASE}/${id}/toggle`, {
-    method: 'POST',
-    headers: getAuthHeaders(),
-  });
-  if (!response.ok) throw new Error('Failed to toggle provider config');
-  const data: ApiResponse<UserProviderConfig> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data!;
+export function addProviderConfig(request: AddProviderConfigRequest): Promise<UserProviderConfig> {
+  return post<UserProviderConfig>(API_BASE, request);
+}
+
+export function updateProviderConfig(id: string, request: UpdateProviderConfigRequest): Promise<UserProviderConfig> {
+  return put<UserProviderConfig>(`${API_BASE}/${id}`, request);
+}
+
+export function deleteProviderConfig(id: string): Promise<boolean> {
+  return del<boolean>(`${API_BASE}/${id}`);
+}
+
+export function toggleProviderConfig(id: string): Promise<UserProviderConfig> {
+  return post<UserProviderConfig>(`${API_BASE}/${id}/toggle`);
+}
+
+export function fetchDomainsByConfig(configId: string): Promise<string[]> {
+  return get<string[]>(`${API_BASE}/${configId}/domains`);
+}
+
+export function fetchRecordsByConfig(
+  configId: string,
+  domain: string,
+  subDomain?: string,
+  recordType?: string
+): Promise<DnsRecordInfo[]> {
+  const params = new URLSearchParams();
+  if (subDomain) params.append('subDomain', subDomain);
+  if (recordType) params.append('recordType', recordType);
+  const queryString = params.toString();
+  const url = `${API_BASE}/${configId}/domains/${encodeURIComponent(domain)}/records${queryString ? `?${queryString}` : ''}`;
+  return get<DnsRecordInfo[]>(url);
+}
+
+export function addDnsRecord(
+  configId: string,
+  domain: string,
+  request: AddDnsRecordRequest
+): Promise<DnsRecordInfo> {
+  const url = `${API_BASE}/${configId}/domains/${encodeURIComponent(domain)}/records`;
+  return post<DnsRecordInfo>(url, request);
+}
+
+export function updateDnsRecord(
+  configId: string,
+  domain: string,
+  recordId: string,
+  request: UpdateDnsRecordRequest
+): Promise<DnsRecordInfo> {
+  const url = `${API_BASE}/${configId}/domains/${encodeURIComponent(domain)}/records/${encodeURIComponent(recordId)}`;
+  return put<DnsRecordInfo>(url, request);
+}
+
+export function deleteDnsRecord(
+  configId: string,
+  domain: string,
+  recordId: string
+): Promise<boolean> {
+  const url = `${API_BASE}/${configId}/domains/${encodeURIComponent(domain)}/records/${encodeURIComponent(recordId)}`;
+  return del<boolean>(url);
 }

@@ -1,12 +1,14 @@
 namespace DnsResolver.Api.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using DnsResolver.Api.Responses;
 using DnsResolver.Application.Commands.DdnsTask;
 using DnsResolver.Application.Queries.GetDdnsTasks;
 
 [ApiController]
 [Route("api/v1/ddns/tasks")]
+[Authorize]
 public class DdnsTaskController : ControllerBase
 {
     private readonly CreateDdnsTaskCommandHandler _createHandler;

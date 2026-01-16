@@ -8,7 +8,8 @@
   "header": {
     "systemOnline": "System Online",
     "logout": "Logout",
-    "switchProvider": "Switch Config"
+    "switchProvider": "Switch Config",
+    "changePassword": "Change Password"
   },
   "login": {
     "title": "System Login",
@@ -119,7 +120,38 @@
     "type": "Type",
     "value": "Value",
     "actions": "Actions",
-    "confirmDelete": "Are you sure you want to delete this record?"
+    "confirmDelete": "Are you sure you want to delete this record?",
+    "saveConfig": "Save Config",
+    "configSaved": "Configuration saved",
+    "configAlreadySaved": "Configuration already exists",
+    "savedConfigs": "Saved Configurations",
+    "noSavedConfigs": "No saved configurations",
+    "confirmDeleteConfig": "Are you sure you want to delete this configuration?",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
+  },
+  "home": {
+    "selectDomain": "Select a domain to view records",
+    "searchPlaceholder": "Search records...",
+    "allTypes": "All Types",
+    "filtered": "Filtered",
+    "total": "Total",
+    "page": "Page",
+    "copyValue": "Copy value",
+    "addRecord": "Add Record",
+    "editRecord": "Edit Record",
+    "deleteRecord": "Delete Record",
+    "confirmDelete": "Are you sure you want to delete this record?",
+    "recordAdded": "Record added successfully",
+    "recordUpdated": "Record updated successfully",
+    "recordDeleted": "Record deleted successfully",
+    "subDomain": "Subdomain",
+    "subDomainPlaceholder": "e.g., www or @",
+    "recordType": "Record Type",
+    "recordValue": "Record Value",
+    "recordValuePlaceholder": "e.g., 192.168.1.1",
+    "ttl": "TTL (seconds)",
+    "ttlPlaceholder": "e.g., 600"
   },
   "language": {
     "zh-CN": "简体中文",
@@ -129,6 +161,8 @@
     "currentIp": "Current Public IP",
     "publicIp": "Public IP Address",
     "ipSource": "IP Source",
+    "autoSelect": "Auto Select",
+    "currentSource": "Current Source",
     "tasks": "DDNS Tasks",
     "addTask": "Add Task",
     "createTask": "Create DDNS Task",
@@ -152,5 +186,20 @@
     "hasError": "Has Error",
     "fillRequired": "Please fill in all required fields",
     "confirmDelete": "Are you sure you want to delete this DDNS task?"
+  },
+  "changePassword": {
+    "title": "Change Password",
+    "currentPassword": "Current Password",
+    "currentPasswordPlaceholder": "Enter current password",
+    "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter new password",
+    "confirmPassword": "Confirm New Password",
+    "confirmPasswordPlaceholder": "Enter new password again",
+    "submit": "Change Password",
+    "submitting": "Changing...",
+    "success": "Password changed successfully",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "allFieldsRequired": "Please fill in all fields"
   }
 }

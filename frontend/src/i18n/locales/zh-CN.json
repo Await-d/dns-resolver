@@ -8,7 +8,8 @@
   "header": {
     "systemOnline": "系统在线",
     "logout": "退出登录",
-    "switchProvider": "切换配置"
+    "switchProvider": "切换配置",
+    "changePassword": "修改密码"
   },
   "login": {
     "title": "系统登录",
@@ -119,7 +120,38 @@
     "type": "类型",
     "value": "记录值",
     "actions": "操作",
-    "confirmDelete": "确定要删除这条记录吗？"
+    "confirmDelete": "确定要删除这条记录吗？",
+    "saveConfig": "保存配置",
+    "configSaved": "配置已保存",
+    "configAlreadySaved": "该配置已存在",
+    "savedConfigs": "已保存的配置",
+    "noSavedConfigs": "暂无已保存的配置",
+    "confirmDeleteConfig": "确定要删除这个配置吗？",
+    "enabled": "已启用",
+    "disabled": "已禁用"
+  },
+  "home": {
+    "selectDomain": "请选择一个域名查看记录",
+    "searchPlaceholder": "搜索记录...",
+    "allTypes": "全部类型",
+    "filtered": "已筛选",
+    "total": "共计",
+    "page": "页",
+    "copyValue": "复制值",
+    "addRecord": "添加记录",
+    "editRecord": "编辑记录",
+    "deleteRecord": "删除记录",
+    "confirmDelete": "确定要删除这条记录吗？",
+    "recordAdded": "记录添加成功",
+    "recordUpdated": "记录更新成功",
+    "recordDeleted": "记录删除成功",
+    "subDomain": "子域名",
+    "subDomainPlaceholder": "例如: www 或 @",
+    "recordType": "记录类型",
+    "recordValue": "记录值",
+    "recordValuePlaceholder": "例如: 192.168.1.1",
+    "ttl": "TTL (秒)",
+    "ttlPlaceholder": "例如: 600"
   },
   "language": {
     "zh-CN": "简体中文",
@@ -129,6 +161,8 @@
     "currentIp": "当前公网 IP",
     "publicIp": "公网 IP 地址",
     "ipSource": "IP 来源",
+    "autoSelect": "自动选择",
+    "currentSource": "当前来源",
     "tasks": "DDNS 任务",
     "addTask": "添加任务",
     "createTask": "创建 DDNS 任务",
@@ -152,5 +186,20 @@
     "hasError": "有错误",
     "fillRequired": "请填写所有必填项",
     "confirmDelete": "确定要删除这个 DDNS 任务吗？"
+  },
+  "changePassword": {
+    "title": "修改密码",
+    "currentPassword": "当前密码",
+    "currentPasswordPlaceholder": "请输入当前密码",
+    "newPassword": "新密码",
+    "newPasswordPlaceholder": "请输入新密码",
+    "confirmPassword": "确认新密码",
+    "confirmPasswordPlaceholder": "请再次输入新密码",
+    "submit": "确认修改",
+    "submitting": "修改中...",
+    "success": "密码修改成功",
+    "passwordMismatch": "两次输入的密码不一致",
+    "passwordTooShort": "密码长度至少为6位",
+    "allFieldsRequired": "请填写所有字段"
   }
 }

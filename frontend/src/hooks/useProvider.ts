@@ -22,19 +22,19 @@ export function useProviders() {
   });
 }
 
-export function useDomains(credentials: ProviderCredentials | null) {
+export function useDomains(credentials: ProviderCredentials | null, needsIdField: boolean = true) {
   return useQuery({
     queryKey: ['domains', credentials?.providerName, credentials?.id],
     queryFn: () => fetchDomains(credentials!),
-    enabled: !!credentials?.providerName && !!credentials?.id && !!credentials?.secret,
+    enabled: !!credentials?.providerName && (needsIdField ? !!credentials?.id : true) && !!credentials?.secret,
   });
 }
 
-export function useRecords(request: GetRecordsRequest | null) {
+export function useRecords(request: GetRecordsRequest | null, needsIdField: boolean = true) {
   return useQuery({
     queryKey: ['records', request?.providerName, request?.domain],
     queryFn: () => fetchRecords(request!),
-    enabled: !!request?.providerName && !!request?.domain && !!request?.id && !!request?.secret,
+    enabled: !!request?.providerName && !!request?.domain && (needsIdField ? !!request?.id : true) && !!request?.secret,
   });
 }
 

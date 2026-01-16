@@ -1,3 +1,4 @@
+import { get, post, put, del } from './apiClient';
 import type {
   DdnsTask,
   CreateDdnsTaskRequest,
@@ -5,85 +6,44 @@ import type {
   DdnsIpResponse,
   DdnsUpdateRequest,
   DdnsUpdateResponse,
-  DdnsApiResponse,
+  IpSourceInfo,
 } from '../types/ddns';
 
 const API_BASE = '/api/v1/ddns';
 
-export async function fetchCurrentIp(): Promise<DdnsIpResponse> {
-  const response = await fetch(`${API_BASE}/ip`);
-  if (!response.ok) throw new Error('Failed to fetch IP');
-  const data: DdnsApiResponse<DdnsIpResponse> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data!;
+export function fetchIpSources(): Promise<IpSourceInfo[]> {
+  return get<IpSourceInfo[]>(`${API_BASE}/ip-sources`);
 }
 
-export async function updateDdns(request: DdnsUpdateRequest): Promise<DdnsUpdateResponse> {
-  const response = await fetch(`${API_BASE}/update`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
-  });
-  if (!response.ok) throw new Error('Failed to update DDNS');
-  const data: DdnsApiResponse<DdnsUpdateResponse> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data!;
+export function fetchCurrentIp(source?: string): Promise<DdnsIpResponse> {
+  const url = source ? `${API_BASE}/ip?source=${encodeURIComponent(source)}` : `${API_BASE}/ip`;
+  return get<DdnsIpResponse>(url);
 }
 
-export async function fetchDdnsTasks(): Promise<DdnsTask[]> {
-  const response = await fetch(`${API_BASE}/tasks`);
-  if (!response.ok) throw new Error('Failed to fetch tasks');
-  const data: DdnsApiResponse<DdnsTask[]> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data || [];
+export function updateDdns(request: DdnsUpdateRequest): Promise<DdnsUpdateResponse> {
+  return post<DdnsUpdateResponse>(`${API_BASE}/update`, request);
 }
 
-export async function createDdnsTask(request: CreateDdnsTaskRequest): Promise<DdnsTask> {
-  const response = await fetch(`${API_BASE}/tasks`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
-  });
-  if (!response.ok) throw new Error('Failed to create task');
-  const data: DdnsApiResponse<DdnsTask> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data!;
+export function fetchDdnsTasks(): Promise<DdnsTask[]> {
+  return get<DdnsTask[]>(`${API_BASE}/tasks`);
 }
 
-export async function updateDdnsTask(taskId: string, request: UpdateDdnsTaskRequest): Promise<void> {
-  const response = await fetch(`${API_BASE}/tasks/${taskId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
-  });
-  if (!response.ok) throw new Error('Failed to update task');
-  const data: DdnsApiResponse<unknown> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
+export function createDdnsTask(request: CreateDdnsTaskRequest): Promise<DdnsTask> {
+  return post<DdnsTask>(`${API_BASE}/tasks`, request);
 }
 
-export async function deleteDdnsTask(taskId: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/tasks/${taskId}`, {
-    method: 'DELETE',
-  });
-  if (!response.ok) throw new Error('Failed to delete task');
-  const data: DdnsApiResponse<unknown> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
+export function updateDdnsTask(taskId: string, request: UpdateDdnsTaskRequest): Promise<void> {
+  return put<void>(`${API_BASE}/tasks/${taskId}`, request);
 }
 
-export async function enableDdnsTask(taskId: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/tasks/${taskId}/enable`, {
-    method: 'POST',
-  });
-  if (!response.ok) throw new Error('Failed to enable task');
-  const data: DdnsApiResponse<unknown> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
+export function deleteDdnsTask(taskId: string): Promise<void> {
+  return del<void>(`${API_BASE}/tasks/${taskId}`);
 }
 
-export async function disableDdnsTask(taskId: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/tasks/${taskId}/disable`, {
-    method: 'POST',
-  });
-  if (!response.ok) throw new Error('Failed to disable task');
-  const data: DdnsApiResponse<unknown> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
+export function enableDdnsTask(taskId: string): Promise<void> {
+  return post<void>(`${API_BASE}/tasks/${taskId}/enable`);
+}
+
+export function disableDdnsTask(taskId: string): Promise<void> {
+  return post<void>(`${API_BASE}/tasks/${taskId}/disable`);
 }

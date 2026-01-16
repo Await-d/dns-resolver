@@ -1,3 +1,5 @@
+import { getAuthHeaders } from './apiClient';
+
 const API_BASE = '/api/auth';
 
 export interface LoginRequest {
@@ -21,14 +23,6 @@ export interface CurrentUserResponse {
   userId: string;
   username: string;
   role: string;
-}
-
-function getAuthHeaders(): HeadersInit {
-  const token = localStorage.getItem('dns_token');
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
 }
 
 export const authApi = {

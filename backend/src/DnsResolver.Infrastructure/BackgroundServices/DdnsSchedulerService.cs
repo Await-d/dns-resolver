@@ -83,7 +83,7 @@ public class DdnsSchedulerService : BackgroundService
         _logger.LogInformation("Checking DDNS task {TaskId} - {TaskName}", task.Id, task.Name);
 
         // 获取当前公网 IP
-        var ipResult = await ddnsService.GetCurrentPublicIpAsync(cancellationToken);
+        var ipResult = await ddnsService.GetCurrentPublicIpAsync(null, cancellationToken);
         task.RecordCheck();
 
         if (!ipResult.Success || string.IsNullOrEmpty(ipResult.Ip))

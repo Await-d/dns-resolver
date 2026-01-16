@@ -1,6 +1,7 @@
 namespace DnsResolver.Api.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using DnsResolver.Api.Requests;
 using DnsResolver.Api.Responses;
 using DnsResolver.Domain.Services;
@@ -8,6 +9,7 @@ using DnsResolver.Infrastructure.DnsProviders;
 
 [ApiController]
 [Route("api/v1/providers")]
+[Authorize]
 public class DnsProviderController : ControllerBase
 {
     private readonly DnsProviderFactory _providerFactory;

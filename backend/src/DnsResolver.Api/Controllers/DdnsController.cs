@@ -1,6 +1,7 @@
 namespace DnsResolver.Api.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using DnsResolver.Api.Responses;
 using DnsResolver.Application.Services;
 using DnsResolver.Domain.Services;
@@ -8,6 +9,7 @@ using DnsResolver.Infrastructure.DnsProviders;
 
 [ApiController]
 [Route("api/v1/ddns")]
+[Authorize]
 public class DdnsController : ControllerBase
 {
     private readonly IDdnsService _ddnsService;
@@ -25,12 +27,26 @@ public class DdnsController : ControllerBase
     }
 
     /// <summary>
+    /// 获取可用的 IP 来源列表
+    /// </summary>
+    [HttpGet("ip-sources")]
+    public ActionResult<ApiResponse<IReadOnlyList<IpSourceResponse>>> GetIpSources()
+    {
+        var sources = _ddnsService.GetAvailableIpSources()
+            .Select(s => new IpSourceResponse(s.Id, s.Name, s.SupportsIpv6))
+            .ToList();
+        return Ok(ApiResponse<IReadOnlyList<IpSourceResponse>>.Ok(sources));
+    }
+
+    /// <summary>
     /// 获取当前公网 IP
     /// </summary>
     [HttpGet("ip")]
-    public async Task<ActionResult<ApiResponse<DdnsIpResponse>>> GetCurrentIp(CancellationToken ct)
+    public async Task<ActionResult<ApiResponse<DdnsIpResponse>>> GetCurrentIp(
+        [FromQuery] string? source,
+        CancellationToken ct)
     {
-        var result = await _ddnsService.GetCurrentPublicIpAsync(ct);
+        var result = await _ddnsService.GetCurrentPublicIpAsync(source, ct);
 
         if (!result.Success)
             return BadRequest(ApiResponse<DdnsIpResponse>.Fail(result.ErrorMessage ?? "获取 IP 失败"));
@@ -48,7 +64,7 @@ public class DdnsController : ControllerBase
         CancellationToken ct)
     {
         // 获取当前公网 IP
-        var ipResult = await _ddnsService.GetCurrentPublicIpAsync(ct);
+        var ipResult = await _ddnsService.GetCurrentPublicIpAsync(null, ct);
         if (!ipResult.Success || string.IsNullOrEmpty(ipResult.Ip))
         {
             return BadRequest(ApiResponse<DdnsUpdateResponse>.Fail(
@@ -126,6 +142,8 @@ public record DdnsUpdateRequest(
     Dictionary<string, string>? ExtraParams = null);
 
 public record DdnsIpResponse(string Ip, string Source);
+
+public record IpSourceResponse(string Id, string Name, bool SupportsIpv6);
 
 public record DdnsUpdateResponse(
     bool Updated,

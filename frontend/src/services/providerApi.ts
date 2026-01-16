@@ -1,3 +1,4 @@
+import { get, post } from './apiClient';
 import type {
   ProviderInfo,
   ProviderCredentials,
@@ -6,74 +7,30 @@ import type {
   UpdateRecordRequest,
   DeleteRecordRequest,
   GetRecordsRequest,
-  ProviderApiResponse,
 } from '../types/provider';
 
 const API_BASE = '/api/v1/providers';
 
 export async function fetchProviders(): Promise<ProviderInfo[]> {
-  const response = await fetch(API_BASE);
-  if (!response.ok) throw new Error('Failed to fetch providers');
-  const data: ProviderApiResponse<ProviderInfo[]> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data || [];
+  return get<ProviderInfo[]>(API_BASE);
 }
 
 export async function fetchDomains(credentials: ProviderCredentials): Promise<string[]> {
-  const response = await fetch(`${API_BASE}/domains`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(credentials),
-  });
-  if (!response.ok) throw new Error('Failed to fetch domains');
-  const data: ProviderApiResponse<string[]> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data || [];
+  return post<string[]>(`${API_BASE}/domains`, credentials);
 }
 
 export async function fetchRecords(request: GetRecordsRequest): Promise<DnsRecordInfo[]> {
-  const response = await fetch(`${API_BASE}/records/list`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
-  });
-  if (!response.ok) throw new Error('Failed to fetch records');
-  const data: ProviderApiResponse<DnsRecordInfo[]> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data || [];
+  return post<DnsRecordInfo[]>(`${API_BASE}/records/list`, request);
 }
 
 export async function addRecord(request: AddRecordRequest): Promise<DnsRecordInfo> {
-  const response = await fetch(`${API_BASE}/records/add`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
-  });
-  if (!response.ok) throw new Error('Failed to add record');
-  const data: ProviderApiResponse<DnsRecordInfo> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data!;
+  return post<DnsRecordInfo>(`${API_BASE}/records/add`, request);
 }
 
 export async function updateRecord(request: UpdateRecordRequest): Promise<DnsRecordInfo> {
-  const response = await fetch(`${API_BASE}/records/update`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
-  });
-  if (!response.ok) throw new Error('Failed to update record');
-  const data: ProviderApiResponse<DnsRecordInfo> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
-  return data.data!;
+  return post<DnsRecordInfo>(`${API_BASE}/records/update`, request);
 }
 
-export async function deleteRecord(request: DeleteRecordRequest): Promise<void> {
-  const response = await fetch(`${API_BASE}/records/delete`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request),
-  });
-  if (!response.ok) throw new Error('Failed to delete record');
-  const data: ProviderApiResponse<boolean> = await response.json();
-  if (!data.success) throw new Error(data.error || 'Failed');
+export async function deleteRecord(request: DeleteRecordRequest): Promise<boolean> {
+  return post<boolean>(`${API_BASE}/records/delete`, request);
 }

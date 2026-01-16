@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import ChangePasswordModal from './ChangePasswordModal';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -15,6 +16,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const location = useLocation();
   const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -142,6 +144,18 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
             {showUserMenu && (
               <div className={`absolute bottom-full mb-1 ${collapsed ? 'left-full ml-1' : 'left-0 right-0'} bg-[var(--bg-secondary)] border border-[var(--border-color)] shadow-lg`}>
                 <button
+                  onClick={() => {
+                    setShowChangePassword(true);
+                    setShowUserMenu(false);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--neon-cyan)] transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                  </svg>
+                  {!collapsed && t('header.changePassword')}
+                </button>
+                <button
                   onClick={handleLogout}
                   className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--neon-red)] transition-all"
                 >
@@ -155,6 +169,11 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
           </div>
         )}
       </div>
+
+      <ChangePasswordModal
+        isOpen={showChangePassword}
+        onClose={() => setShowChangePassword(false)}
+      />
     </aside>
   );
 }

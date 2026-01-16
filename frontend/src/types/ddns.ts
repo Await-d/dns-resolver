@@ -65,3 +65,9 @@ export interface DdnsApiResponse<T> {
   data?: T;
   error?: string;
 }
+
+export interface IpSourceInfo {
+  id: string;
+  name: string;
+  supportsIpv6: boolean;
+}

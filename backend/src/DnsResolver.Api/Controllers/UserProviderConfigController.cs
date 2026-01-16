@@ -214,6 +214,154 @@ public class UserProviderConfigController : ControllerBase
         return Ok(ApiResponse<UserProviderConfigDto>.Ok(dto));
     }
 
+    /// <summary>
+    /// 通过配置 ID 获取域名列表
+    /// </summary>
+    [HttpGet("{id:guid}/domains")]
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<string>>>> GetDomainsByConfig(Guid id, CancellationToken ct)
+    {
+        var userId = await GetCurrentUserIdAsync(ct);
+        if (userId == null)
+            return Unauthorized(ApiResponse<IReadOnlyList<string>>.Fail("User not found"));
+
+        var config = await _configRepository.GetByIdAsync(id, ct);
+        if (config == null || config.UserId != userId.Value)
+            return NotFound(ApiResponse<IReadOnlyList<string>>.Fail("Config not found"));
+
+        var providerConfig = new DnsProviderConfig(config.ApiId, config.ApiSecret, config.ExtraParams);
+        var provider = _providerFactory.CreateProvider(config.ProviderName, providerConfig);
+        if (provider == null)
+            return NotFound(ApiResponse<IReadOnlyList<string>>.Fail("Provider not found"));
+
+        var result = await provider.GetDomainsAsync(ct);
+        if (!result.Success)
+            return BadRequest(ApiResponse<IReadOnlyList<string>>.Fail(result.ErrorMessage ?? "Failed"));
+
+        return Ok(ApiResponse<IReadOnlyList<string>>.Ok(result.Data!));
+    }
+
+    /// <summary>
+    /// 通过配置 ID 获取 DNS 记录列表
+    /// </summary>
+    [HttpGet("{id:guid}/domains/{domain}/records")]
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<DnsRecordInfo>>>> GetRecordsByConfig(
+        Guid id,
+        string domain,
+        [FromQuery] string? subDomain = null,
+        [FromQuery] string? recordType = null,
+        CancellationToken ct = default)
+    {
+        var userId = await GetCurrentUserIdAsync(ct);
+        if (userId == null)
+            return Unauthorized(ApiResponse<IReadOnlyList<DnsRecordInfo>>.Fail("User not found"));
+
+        var config = await _configRepository.GetByIdAsync(id, ct);
+        if (config == null || config.UserId != userId.Value)
+            return NotFound(ApiResponse<IReadOnlyList<DnsRecordInfo>>.Fail("Config not found"));
+
+        var providerConfig = new DnsProviderConfig(config.ApiId, config.ApiSecret, config.ExtraParams);
+        var provider = _providerFactory.CreateProvider(config.ProviderName, providerConfig);
+        if (provider == null)
+            return NotFound(ApiResponse<IReadOnlyList<DnsRecordInfo>>.Fail("Provider not found"));
+
+        var result = await provider.GetRecordsAsync(domain, subDomain, recordType, ct);
+        if (!result.Success)
+            return BadRequest(ApiResponse<IReadOnlyList<DnsRecordInfo>>.Fail(result.ErrorMessage ?? "Failed"));
+
+        return Ok(ApiResponse<IReadOnlyList<DnsRecordInfo>>.Ok(result.Data!));
+    }
+
+    /// <summary>
+    /// 添加 DNS 记录
+    /// </summary>
+    [HttpPost("{id:guid}/domains/{domain}/records")]
+    public async Task<ActionResult<ApiResponse<DnsRecordInfo>>> AddRecord(
+        Guid id,
+        string domain,
+        [FromBody] AddDnsRecordRequest request,
+        CancellationToken ct = default)
+    {
+        var userId = await GetCurrentUserIdAsync(ct);
+        if (userId == null)
+            return Unauthorized(ApiResponse<DnsRecordInfo>.Fail("User not found"));
+
+        var config = await _configRepository.GetByIdAsync(id, ct);
+        if (config == null || config.UserId != userId.Value)
+            return NotFound(ApiResponse<DnsRecordInfo>.Fail("Config not found"));
+
+        var providerConfig = new DnsProviderConfig(config.ApiId, config.ApiSecret, config.ExtraParams);
+        var provider = _providerFactory.CreateProvider(config.ProviderName, providerConfig);
+        if (provider == null)
+            return NotFound(ApiResponse<DnsRecordInfo>.Fail("Provider not found"));
+
+        var result = await provider.AddRecordAsync(domain, request.SubDomain, request.RecordType, request.Value, request.Ttl, ct);
+        if (!result.Success)
+            return BadRequest(ApiResponse<DnsRecordInfo>.Fail(result.ErrorMessage ?? "Failed to add record"));
+
+        return Ok(ApiResponse<DnsRecordInfo>.Ok(result.Data!));
+    }
+
+    /// <summary>
+    /// 更新 DNS 记录
+    /// </summary>
+    [HttpPut("{id:guid}/domains/{domain}/records/{recordId}")]
+    public async Task<ActionResult<ApiResponse<DnsRecordInfo>>> UpdateRecord(
+        Guid id,
+        string domain,
+        string recordId,
+        [FromBody] UpdateDnsRecordRequest request,
+        CancellationToken ct = default)
+    {
+        var userId = await GetCurrentUserIdAsync(ct);
+        if (userId == null)
+            return Unauthorized(ApiResponse<DnsRecordInfo>.Fail("User not found"));
+
+        var config = await _configRepository.GetByIdAsync(id, ct);
+        if (config == null || config.UserId != userId.Value)
+            return NotFound(ApiResponse<DnsRecordInfo>.Fail("Config not found"));
+
+        var providerConfig = new DnsProviderConfig(config.ApiId, config.ApiSecret, config.ExtraParams);
+        var provider = _providerFactory.CreateProvider(config.ProviderName, providerConfig);
+        if (provider == null)
+            return NotFound(ApiResponse<DnsRecordInfo>.Fail("Provider not found"));
+
+        var result = await provider.UpdateRecordAsync(domain, recordId, request.Value, request.Ttl, ct);
+        if (!result.Success)
+            return BadRequest(ApiResponse<DnsRecordInfo>.Fail(result.ErrorMessage ?? "Failed to update record"));
+
+        return Ok(ApiResponse<DnsRecordInfo>.Ok(result.Data!));
+    }
+
+    /// <summary>
+    /// 删除 DNS 记录
+    /// </summary>
+    [HttpDelete("{id:guid}/domains/{domain}/records/{recordId}")]
+    public async Task<ActionResult<ApiResponse<bool>>> DeleteRecord(
+        Guid id,
+        string domain,
+        string recordId,
+        CancellationToken ct = default)
+    {
+        var userId = await GetCurrentUserIdAsync(ct);
+        if (userId == null)
+            return Unauthorized(ApiResponse<bool>.Fail("User not found"));
+
+        var config = await _configRepository.GetByIdAsync(id, ct);
+        if (config == null || config.UserId != userId.Value)
+            return NotFound(ApiResponse<bool>.Fail("Config not found"));
+
+        var providerConfig = new DnsProviderConfig(config.ApiId, config.ApiSecret, config.ExtraParams);
+        var provider = _providerFactory.CreateProvider(config.ProviderName, providerConfig);
+        if (provider == null)
+            return NotFound(ApiResponse<bool>.Fail("Provider not found"));
+
+        var result = await provider.DeleteRecordAsync(domain, recordId, ct);
+        if (!result.Success)
+            return BadRequest(ApiResponse<bool>.Fail(result.ErrorMessage ?? "Failed to delete record"));
+
+        return Ok(ApiResponse<bool>.Ok(true));
+    }
+
     private async Task<Guid?> GetCurrentUserIdAsync(CancellationToken ct)
     {
         var username = User.FindFirst(ClaimTypes.Name)?.Value;
@@ -279,4 +427,16 @@ public record UpdateUserProviderConfigRequest(
     string ApiId,
     string ApiSecret,
     Dictionary<string, string>? ExtraParams = null
+);
+
+public record AddDnsRecordRequest(
+    string SubDomain,
+    string RecordType,
+    string Value,
+    int Ttl = 600
+);
+
+public record UpdateDnsRecordRequest(
+    string Value,
+    int? Ttl = null
 );
